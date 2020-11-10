@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
 #include <random>
 
@@ -151,10 +150,11 @@ public:
 
 	void SetShips()
 	{
+		SetShip(3);
+		SetShip(3);
 		SetShip(2);
 		SetShip(2);
 		SetShip(2);
-		SetShip(1);
 		SetShip(1);
 		SetShip(1);
 	}
@@ -162,14 +162,14 @@ public:
 	void SetShip(int size)
 	{
 		std::vector<Brick*> bricksForShips;
+		std::random_device device;
+		std::mt19937 generator(device());
 
 		if (size != 1)
 		{
-			std::random_device device;
-			std::mt19937 generator(device());
 			std::uniform_int_distribution<int> distribution(0, (this->size * this->size) - 1);
 
-			int random = 1;
+			int random = distribution(generator);
 
 			switch (random % 2)
 			{
@@ -177,7 +177,7 @@ public:
 			{
 				Brick* brick;
 				std::vector<Brick*> chosenBricks;
-				distribution = std::uniform_int_distribution<int>(0, ((this->size * this->size) - 1) - (this->size * (size - 1))); //maxindex - rozmiar tablicy * rozmiar statku-1
+				distribution = std::uniform_int_distribution<int>(0, (this->size * this->size) - 1);
 				bool isBrickOccupied;
 
 				do
@@ -185,6 +185,14 @@ public:
 					chosenBricks.clear();
 
 					random = distribution(generator);
+					int rightSideDistance = this->size - (random % this->size); // how far away from right side
+
+					while (rightSideDistance < size)
+					{
+						random = distribution(generator);
+						rightSideDistance = this->size - (random % this->size);
+					}
+
 					brick = &bricks[random];
 					chosenBricks.push_back(brick);
 
@@ -193,11 +201,11 @@ public:
 
 					while (countBricks > 0)
 					{
-						int indexBelow = random + ((this->size) * countBricks);
-						if (bricks[indexBelow].isPartOfAShip)
+						int indexToRight = random + countBricks;
+						if (bricks[indexToRight].isPartOfAShip)
 							isBrickOccupied = true;
 
-						chosenBricks.push_back(&bricks[indexBelow]);
+						chosenBricks.push_back(&bricks[indexToRight]);
 						countBricks--;
 					}
 
@@ -216,7 +224,7 @@ public:
 			{
 				Brick* brick;
 				std::vector<Brick*> chosenBricks;
-				distribution = std::uniform_int_distribution<int>(0, ((this->size * this->size) - 1) - (this->size * (size - 1)));
+				distribution = std::uniform_int_distribution<int>(0, ((this->size * this->size) - 1) - (this->size * (size - 1))); //maxindex - rozmiar tablicy * rozmiar statku - 1
 				bool isBrickOccupied;
 
 				do
@@ -256,8 +264,7 @@ public:
 		}
 		else
 		{
-			std::random_device device;
-			std::mt19937 generator(device());
+
 			std::uniform_int_distribution<int> distribution(0, (this->size * this->size) - 1);
 
 			Brick* brick;
@@ -279,7 +286,7 @@ public:
 
 int main()
 {
-	Board board = Board(3);
+	Board board = Board(6);
 
 	int x, y;
 
