@@ -6,14 +6,15 @@ class GameManager
 {
 public:
 	Board firstBoard, secondBoard;
-	bool isGameRunning;
+	bool isGameRunning = false;
+	bool versusComputer = false;
 	int boardSize;
 	int numberOfPlayers;
 	int waitShowTimeSeconds = 1;
 	int waitBetweenPlayersSeconds = 1;
 	std::vector<Ship> firstPlayerShips, secondPlayersShips;
 
-	GameManager(int boardSize);
+	GameManager();
 
 	void Play();
 	bool ShootBrick(Board& board, int xBrick, int yBrick);

@@ -3,8 +3,23 @@
 #include <Windows.h>
 #include "GameManager.h"
 
-GameManager::GameManager(int boardSize)
+GameManager::GameManager()
 {
+	std::cout << "How big should be the board (even number reccomended and has to be between 4 and 8): ";
+	int boardSize = 0;
+
+	std::cin >> boardSize;
+
+	while (boardSize < 4 || boardSize > 8)
+	{
+		if (boardSize < 4 || boardSize > 8)
+			std::cout << "Wrong value\n";
+
+		std::cin >> boardSize;
+	}
+
+	this->boardSize = boardSize;
+
 	std::cout << "How many players (1 or 2): ";
 	int numberOfPlayers = 0;
 	
@@ -17,16 +32,43 @@ GameManager::GameManager(int boardSize)
 	}
 
 	this->numberOfPlayers = numberOfPlayers;
+
+	if (numberOfPlayers == 1)
+	{
+		std::cout << "Do you wish to play 2-player game vs computer?" << std::endl << "Yes: type 1	No: type 0" << std::endl;
+		int number = -1;
+		versusComputer = false;
+
+		while (number != 0 && number != 1)
+		{
+			std::cin >> number;
+
+			if (number != 0 && number != 1)
+				std::cout << "Wrong value\n";
+		}
+		
+		if (number == 1)
+			versusComputer = true;
+	}
 	
 	system("CLS");
 
-	this->boardSize = boardSize;
 	isGameRunning = true;
 
 	if (numberOfPlayers == 1)
 	{
-		firstBoard = Board(boardSize);
-		SetShips(firstBoard, firstPlayerShips);
+		if (versusComputer)
+		{
+			firstBoard = Board(boardSize);
+			SetShips(firstBoard, firstPlayerShips);
+			secondBoard = Board(boardSize);
+			SetShips(secondBoard, secondPlayersShips);
+		}
+		else
+		{
+			firstBoard = Board(boardSize);
+			SetShips(firstBoard, firstPlayerShips);
+		}
 	}
 	else
 	{
@@ -42,39 +84,141 @@ void GameManager::Play()
 	int x, y;
 	if (numberOfPlayers == 1)
 	{
-		while (isGameRunning)
+		if (versusComputer)
 		{
-			bool areValuesProper = false;
-
-			do
+			while (isGameRunning)
 			{
-				areValuesProper = false;
+				system("CLS");
 
-				std::cout << "Enter X value: ";
-				std::cin >> x;
-				std::cout << "Enter Y value: ";
-				std::cin >> y;
+				std::cout << "First Player:\n";
 
-				if (ShootBrick(firstBoard, x, y))
+				firstBoard.SpawnBoard();
+
+				bool areValuesProper = false;
+
+				do
 				{
-					areValuesProper = true;
+					areValuesProper = false;
+
+					std::cout << "Enter X value: ";
+					std::cin >> x;
+					std::cout << "Enter Y value: ";
+					std::cin >> y;
+
+					if (ShootBrick(firstBoard, x, y))
+					{
+						areValuesProper = true;
+						continue;
+					}
+
+					std::cout << "Wrong values, please try again" << std::endl;
+
+				} while (!areValuesProper);
+
+				system("CLS");
+				std::cout << "You:\n";
+				firstBoard.SpawnBoard();
+
+				if (AreAllShipsDestroyed(firstPlayerShips))
+				{
+					isGameRunning = false;
 					continue;
 				}
-					
-				std::cout << "Wrong values, please try again" << std::endl;
 
-			} while (!areValuesProper);
+				Wait(waitShowTimeSeconds);
 
-			system("CLS");
-			firstBoard.SpawnBoard();
+				system("CLS");
+				std::cout << "Computer moves in: ";
+				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+				{
+					std::cout << i << std::endl;
+					Wait(1);
+				}
 
-			if (AreAllShipsDestroyed(firstPlayerShips))
-			{
-				isGameRunning = false;
+				system("CLS");
+
+				std::cout << "Computer:\n";
+
+				secondBoard.SpawnBoard();
+
+				do
+				{
+					areValuesProper = false;
+
+					std::random_device device;
+					std::mt19937 generator(device());
+					std::uniform_int_distribution<int> distribution(1, this->boardSize);
+
+					x = distribution(generator);
+					y = distribution(generator);
+
+					if (ShootBrick(secondBoard, x, y))
+					{
+						areValuesProper = true;
+						continue;
+					}
+
+				} while (!areValuesProper);
+
+				system("CLS");
+				std::cout << "Computer:\n";
+				secondBoard.SpawnBoard();
+
+				if (AreAllShipsDestroyed(secondPlayersShips))
+				{
+					isGameRunning = false;
+					continue;
+				}
+
+				Wait(waitShowTimeSeconds);
+
+				system("CLS");
+				std::cout << "Your move in: ";
+				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+				{
+					std::cout << i << std::endl;
+					Wait(1);
+				}
 			}
-		}
 
-		std::cout << "Congratulations you've won :D" << std::endl;
+			std::cout << "Congratulations you've won :D" << std::endl;
+		}
+		else
+		{
+			while (isGameRunning)
+			{
+				bool areValuesProper = false;
+
+				do
+				{
+					areValuesProper = false;
+
+					std::cout << "Enter X value: ";
+					std::cin >> x;
+					std::cout << "Enter Y value: ";
+					std::cin >> y;
+
+					if (ShootBrick(firstBoard, x, y))
+					{
+						areValuesProper = true;
+						continue;
+					}
+
+					std::cout << "Wrong values, please try again" << std::endl;
+
+				} while (!areValuesProper);
+
+				system("CLS");
+				firstBoard.SpawnBoard();
+
+				if (AreAllShipsDestroyed(firstPlayerShips))
+				{
+					isGameRunning = false;
+				}
+			}
+
+			std::cout << "Congratulations you've won :D" << std::endl;
+		}
 	}
 	else
 	{
@@ -196,20 +340,38 @@ bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick)
 			return true;
 		}
 	}
+	return true;
 }
 
 void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector)
 {
-	//SetShip(board, 3);
-	//SetShip(board, 3);
-	SetShip(board, playerShipsVector, 2);
-	//SetShip(board, 2);
-	//SetShip(board, 1);
-	SetShip(board, playerShipsVector, 1);
+	int biggestShipSize = this->boardSize / 2;
+	int shipSize = biggestShipSize;
 
-	for (int i = 0; i < board.bricks.size(); i++) // TEST HACK
+	for (int i = biggestShipSize; i > 0; i--)
 	{
-		//board.bricks[i].Shoot();
+		int shipsNumber = this->boardSize / shipSize;
+		if (shipSize != 1)
+		{
+			for (int j = shipsNumber; j > 0; j--)
+			{
+				SetShip(board, playerShipsVector, shipSize);
+			}
+		}
+		else
+		{
+			for (int j = (shipsNumber / 2) - 1; j > 0; j--)
+			{
+				SetShip(board, playerShipsVector, shipSize);
+			}
+		}
+		shipSize--;
+	}
+
+	// TEST HACK
+	for (int i = 1; i < board.bricks.size(); i++) 
+	{
+		board.bricks[i].Shoot();
 	}
 }
 
@@ -223,7 +385,7 @@ void GameManager::SetShip(Board& board, std::vector<Ship>& playerShipsVector, in
 	{
 		std::uniform_int_distribution<int> distribution(0, (this->boardSize * this->boardSize) - 1);
 
-		int random = 1;
+		int random = distribution(generator);
 
 		switch (random % 2)
 		{
