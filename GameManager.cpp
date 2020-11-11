@@ -98,6 +98,7 @@ void GameManager::Play()
 
 				do
 				{
+					Brick brick;
 					areValuesProper = false;
 
 					std::cout << "Enter X value: ";
@@ -105,7 +106,7 @@ void GameManager::Play()
 					std::cout << "Enter Y value: ";
 					std::cin >> y;
 
-					if (ShootBrick(firstBoard, x, y))
+					if (ShootBrick(firstBoard, x, y, brick))
 					{
 						areValuesProper = true;
 						continue;
@@ -143,6 +144,7 @@ void GameManager::Play()
 
 				do
 				{
+					Brick brick;
 					areValuesProper = false;
 
 					std::random_device device;
@@ -152,7 +154,7 @@ void GameManager::Play()
 					x = distribution(generator);
 					y = distribution(generator);
 
-					if (ShootBrick(secondBoard, x, y))
+					if (ShootBrick(secondBoard, x, y, brick))
 					{
 						areValuesProper = true;
 						continue;
@@ -191,6 +193,7 @@ void GameManager::Play()
 
 				do
 				{
+					Brick brick;
 					areValuesProper = false;
 
 					std::cout << "Enter X value: ";
@@ -198,7 +201,7 @@ void GameManager::Play()
 					std::cout << "Enter Y value: ";
 					std::cin >> y;
 
-					if (ShootBrick(firstBoard, x, y))
+					if (ShootBrick(firstBoard, x, y, brick))
 					{
 						areValuesProper = true;
 						continue;
@@ -231,37 +234,45 @@ void GameManager::Play()
 			firstBoard.SpawnBoard();
 
 			bool areValuesProper = false;
+			Brick brick;
 
 			do
 			{
-				areValuesProper = false;
-
-				std::cout << "Enter X value: ";
-				std::cin >> x;
-				std::cout << "Enter Y value: ";
-				std::cin >> y;
-
-				if (ShootBrick(firstBoard, x, y))
+				do
 				{
-					areValuesProper = true;
+					areValuesProper = false;
+
+					std::cout << "Enter X value: ";
+					std::cin >> x;
+					std::cout << "Enter Y value: ";
+					std::cin >> y;
+
+					if (ShootBrick(firstBoard, x, y, brick))
+					{
+						areValuesProper = true;
+						continue;
+					}
+
+					std::cout << "Wrong values, please try again" << std::endl;
+
+				} while (!areValuesProper);
+
+				system("CLS");
+				std::cout << "First Player:\n";
+				firstBoard.SpawnBoard();
+
+				if (AreAllShipsDestroyed(firstPlayerShips))
+				{
+					isGameRunning = false;
 					continue;
 				}
 
-				std::cout << "Wrong values, please try again" << std::endl;
+				Wait(waitShowTimeSeconds);
 
-			} while (!areValuesProper);
+			} while (brick.isPartOfAShip);
 
-			system("CLS");
-			std::cout << "First Player:\n";
-			firstBoard.SpawnBoard();
-
-			if (AreAllShipsDestroyed(firstPlayerShips))
-			{
-				isGameRunning = false;
+			if (!isGameRunning)
 				continue;
-			}
-
-			Wait(waitShowTimeSeconds);
 
 			system("CLS");
 			std::cout << "Next player in: ";
@@ -276,37 +287,45 @@ void GameManager::Play()
 			std::cout << "Second Player:\n";
 			
 			secondBoard.SpawnBoard();
+			Brick shootedBrick;
 
 			do
 			{
-				areValuesProper = false;
-
-				std::cout << "Enter X value: ";
-				std::cin >> x;
-				std::cout << "Enter Y value: ";
-				std::cin >> y;
-
-				if (ShootBrick(secondBoard, x, y))
+				do
 				{
-					areValuesProper = true;
+					areValuesProper = false;
+
+					std::cout << "Enter X value: ";
+					std::cin >> x;
+					std::cout << "Enter Y value: ";
+					std::cin >> y;
+
+					if (ShootBrick(secondBoard, x, y, brick))
+					{
+						areValuesProper = true;
+						continue;
+					}
+
+					std::cout << "Wrong values, please try again" << std::endl;
+
+				} while (!areValuesProper);
+
+				system("CLS");
+				std::cout << "Second Player:\n";
+				secondBoard.SpawnBoard();
+
+				if (AreAllShipsDestroyed(secondPlayersShips))
+				{
+					isGameRunning = false;
 					continue;
 				}
 
-				std::cout << "Wrong values, please try again" << std::endl;
+				Wait(waitShowTimeSeconds);
 
-			} while (!areValuesProper);
+			} while (brick.isPartOfAShip);
 
-			system("CLS");
-			std::cout << "Second Player:\n";
-			secondBoard.SpawnBoard();
-
-			if (AreAllShipsDestroyed(secondPlayersShips))
-			{
-				isGameRunning = false;
+			if (!isGameRunning)
 				continue;
-			}
-
-			Wait(waitShowTimeSeconds);
 
 			system("CLS");
 			std::cout << "Next player in: ";
@@ -322,7 +341,7 @@ void GameManager::Play()
 
 }
 
-bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick)
+bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyBrickPtr)
 {
 	if (xBrick > boardSize || yBrick > boardSize)
 		return false;
@@ -337,6 +356,7 @@ bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick)
 			}
 
 			board.bricks[i].Shoot();
+			emptyBrickPtr = board.bricks[i];
 			return true;
 		}
 	}
@@ -371,7 +391,7 @@ void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector)
 	// TEST HACK
 	for (int i = 1; i < board.bricks.size(); i++) 
 	{
-		board.bricks[i].Shoot();
+		//board.bricks[i].Shoot();
 	}
 }
 

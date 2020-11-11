@@ -17,7 +17,7 @@ public:
 	GameManager();
 
 	void Play();
-	bool ShootBrick(Board& board, int xBrick, int yBrick);
+	bool ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyBrickPtr);
 	void SetShips(Board& board, std::vector<Ship>& playerShipsVector);
 	void SetShip(Board& board, std::vector<Ship>& playerShipsVector, int shipSize);
 	void Wait(int seconds);

@@ -13,6 +13,7 @@ public:
 
 	BrickState state;
 
+	Brick();
 	Brick(int x, int y);
 
 	char Spawn();
