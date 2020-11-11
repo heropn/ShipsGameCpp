@@ -10,5 +10,5 @@ public:
 	Board();
 	Board(int size);
 
-	void SpawnBoard(int xBrick, int yBrick);
+	void SpawnBoard();
 };

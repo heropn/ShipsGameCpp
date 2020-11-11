@@ -5,6 +5,6 @@
 
 int main()
 {
-	GameManager game = GameManager(6);
+	GameManager game = GameManager(3);
 	game.Play();
 }

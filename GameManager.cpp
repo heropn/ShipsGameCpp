@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <Windows.h>
 #include "GameManager.h"
 
 GameManager::GameManager(int boardSize)
@@ -25,14 +26,14 @@ GameManager::GameManager(int boardSize)
 	if (numberOfPlayers == 1)
 	{
 		firstBoard = Board(boardSize);
-		SetShips(firstBoard);
+		SetShips(firstBoard, firstPlayerShips);
 	}
 	else
 	{
 		firstBoard = Board(boardSize);
-		SetShips(firstBoard);
+		SetShips(firstBoard, firstPlayerShips);
 		secondBoard = Board(boardSize);
-		SetShips(secondBoard);
+		SetShips(secondBoard, secondPlayersShips);
 	}
 }
 
@@ -43,12 +44,34 @@ void GameManager::Play()
 	{
 		while (isGameRunning)
 		{
-			std::cout << "Enter X value: ";
-			std::cin >> x;
-			std::cout << "Enter Y value: ";
-			std::cin >> y;
+			bool areValuesProper = false;
 
-			ShootBrickAndSpawnBoard(firstBoard, x, y);
+			do
+			{
+				areValuesProper = false;
+
+				std::cout << "Enter X value: ";
+				std::cin >> x;
+				std::cout << "Enter Y value: ";
+				std::cin >> y;
+
+				if (ShootBrick(firstBoard, x, y))
+				{
+					areValuesProper = true;
+					continue;
+				}
+					
+				std::cout << "Wrong values, please try again" << std::endl;
+
+			} while (!areValuesProper);
+
+			system("CLS");
+			firstBoard.SpawnBoard();
+
+			if (AreAllShipsDestroyed(firstPlayerShips))
+			{
+				isGameRunning = false;
+			}
 		}
 
 		std::cout << "Congratulations you've won :D" << std::endl;
@@ -57,60 +80,140 @@ void GameManager::Play()
 	{
 		while (isGameRunning)
 		{
+			system("CLS");
+
 			std::cout << "First Player:\n";
+			
+			firstBoard.SpawnBoard();
 
-			std::cout << "Enter X value: ";
-			std::cin >> x;
-			std::cout << "Enter Y value: ";
-			std::cin >> y;
+			bool areValuesProper = false;
 
-			ShootBrickAndSpawnBoard(firstBoard, x, y);
+			do
+			{
+				areValuesProper = false;
+
+				std::cout << "Enter X value: ";
+				std::cin >> x;
+				std::cout << "Enter Y value: ";
+				std::cin >> y;
+
+				if (ShootBrick(firstBoard, x, y))
+				{
+					areValuesProper = true;
+					continue;
+				}
+
+				std::cout << "Wrong values, please try again" << std::endl;
+
+			} while (!areValuesProper);
+
+			system("CLS");
+			std::cout << "First Player:\n";
+			firstBoard.SpawnBoard();
+
+			if (AreAllShipsDestroyed(firstPlayerShips))
+			{
+				isGameRunning = false;
+				continue;
+			}
+
+			Wait(waitShowTimeSeconds);
+
+			system("CLS");
+			std::cout << "Next player in: ";
+			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+			{
+				std::cout << i << std::endl;
+				Wait(1);
+			}
+
+			system("CLS");
 
 			std::cout << "Second Player:\n";
+			
+			secondBoard.SpawnBoard();
 
-			std::cout << "Enter X value: ";
-			std::cin >> x;
-			std::cout << "Enter Y value: ";
-			std::cin >> y;
+			do
+			{
+				areValuesProper = false;
 
-			ShootBrickAndSpawnBoard(secondBoard, x, y);
+				std::cout << "Enter X value: ";
+				std::cin >> x;
+				std::cout << "Enter Y value: ";
+				std::cin >> y;
+
+				if (ShootBrick(secondBoard, x, y))
+				{
+					areValuesProper = true;
+					continue;
+				}
+
+				std::cout << "Wrong values, please try again" << std::endl;
+
+			} while (!areValuesProper);
+
+			system("CLS");
+			std::cout << "Second Player:\n";
+			secondBoard.SpawnBoard();
+
+			if (AreAllShipsDestroyed(secondPlayersShips))
+			{
+				isGameRunning = false;
+				continue;
+			}
+
+			Wait(waitShowTimeSeconds);
+
+			system("CLS");
+			std::cout << "Next player in: ";
+			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+			{
+				std::cout << i << std::endl;
+				Wait(1);
+			}
 		}
+
+		std::cout << "Congratulations you've won :D" << std::endl;
 	}
 
 }
 
-void GameManager::ShootBrickAndSpawnBoard(Board& board, int xBrick, int yBrick)
+bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick)
 {
 	if (xBrick > boardSize || yBrick > boardSize)
+		return false;
+
+	for (int i = 0; i < board.bricks.size(); i++)
 	{
-		std::cout << "Wrong values, please try again" << std::endl;
-		return;
+		if (xBrick == board.bricks[i].x && yBrick == board.bricks[i].y)
+		{
+			if (board.bricks[i].state == Brick::BrickState::Shot)
+			{
+				return false;
+			}
+
+			board.bricks[i].Shoot();
+			return true;
+		}
 	}
-
-	system("CLS");
-
-	board.SpawnBoard(xBrick, yBrick);
-	
-	if (CheckIfShipGotDestoyed())
-		isGameRunning = false;
 }
 
-void GameManager::SetShips(Board& board)
+void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector)
 {
-	SetShip(board, 3);
-	SetShip(board, 3);
-	SetShip(board, 2);
-	SetShip(board, 2);
-	SetShip(board, 1);
-	SetShip(board, 1);
+	//SetShip(board, 3);
+	//SetShip(board, 3);
+	SetShip(board, playerShipsVector, 2);
+	//SetShip(board, 2);
+	//SetShip(board, 1);
+	SetShip(board, playerShipsVector, 1);
 
 	for (int i = 0; i < board.bricks.size(); i++) // TEST HACK
 	{
-		board.bricks[i].Shoot();
+		//board.bricks[i].Shoot();
 	}
 }
 
-void GameManager::SetShip(Board& board, int shipSize)
+void GameManager::SetShip(Board& board, std::vector<Ship>& playerShipsVector, int shipSize)
 {
 	std::vector<Brick*> bricksForShips;
 	std::random_device device;
@@ -178,7 +281,7 @@ void GameManager::SetShip(Board& board, int shipSize)
 			}
 
 			Ship ship = Ship(bricksForShips, shipSize);
-			firstPlayerShips.push_back(ship);
+			playerShipsVector.push_back(ship);
 		}break;
 		case 1: // vertical
 		{
@@ -226,7 +329,7 @@ void GameManager::SetShip(Board& board, int shipSize)
 			}
 
 			Ship ship = Ship(bricksForShips, shipSize);
-			firstPlayerShips.push_back(ship);
+			playerShipsVector.push_back(ship);
 		}break;
 		}
 
@@ -252,25 +355,30 @@ void GameManager::SetShip(Board& board, int shipSize)
 		bricksForShips.push_back(brick);
 
 		Ship ship = Ship(bricksForShips);
-		firstPlayerShips.push_back(ship);
+		playerShipsVector.push_back(ship);
 	}
 }
 
-bool GameManager::CheckIfShipGotDestoyed()
+void GameManager::Wait(int seconds)
+{
+	Sleep(seconds * 1000);
+}
+
+bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 {
 	int sumOfSizes = 0;
 
-	for (int i = 0; i < firstPlayerShips.size(); i++)
+	for (int i = 0; i < playerShips.size(); i++)
 	{
 		int bricksDestroyed = 0;
-		for (int j = 0; j < firstPlayerShips[i].size; j++)
+		for (int j = 0; j < playerShips[i].size; j++)
 		{
-			if (firstPlayerShips[i].shipsBricks[j]->state == Brick::BrickState::Shot)
+			if (playerShips[i].shipsBricks[j]->state == Brick::BrickState::Shot)
 				bricksDestroyed++;
 		}
 
-		firstPlayerShips[i].size -= bricksDestroyed;
-		sumOfSizes += firstPlayerShips[i].size;
+		playerShips[i].size -= bricksDestroyed;
+		sumOfSizes += playerShips[i].size;
 	}
 	if (sumOfSizes != 0)
 		return false;

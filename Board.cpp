@@ -32,7 +32,7 @@ Board::Board(int size)
 	}
 }
 
-void Board::SpawnBoard(int xBrick, int yBrick)
+void Board::SpawnBoard()
 {
 	int index = 0;
 	std::cout << " ";
@@ -46,17 +46,7 @@ void Board::SpawnBoard(int xBrick, int yBrick)
 				std::cout << i << " ";
 			else if (i != 0)
 			{
-				if (xBrick == bricks[index].x && yBrick == bricks[index].y && bricks[index].state != Brick::Shot)
-				{
-					bricks[index].Shoot();
-					std::cout << bricks[index].Spawn() << " ";
-				}
-				else
-				{
-					std::cout << bricks[index].Spawn() << " ";
-				}
-
-				index++;
+				std::cout << bricks[index++].Spawn() << " ";
 			}
 		}
 		std::cout << std::endl;
