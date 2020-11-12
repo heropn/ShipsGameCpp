@@ -19,8 +19,9 @@ public:
 
 	void Play();
 
-	void SetShips(Board& board, std::vector<Ship>& playerShipsVector);
-	void SetShip(Board& board, std::vector<Ship>& playerShipsVector, int shipSize);
+	void SetShips(Board& board, std::vector<Ship>& playerShipsVector, std::string playerName, bool isAutomatic);
+	void SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShipsVector, int shipSize);
+	void SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, std::string playerName);
 	void Wait(float seconds);
 	void Move(Board& board, std::vector<Ship>& ships, std::string playerName, bool isComputer = false);
 

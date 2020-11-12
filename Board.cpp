@@ -32,6 +32,18 @@ Board::Board(int size)
 	}
 }
 
+void Board::ShowAllBricks()
+{
+	for (int i = 0; i < bricks.size(); i++)
+		bricks[i].Show();
+}
+
+void Board::HideAllBricks()
+{
+	for (int i = 0; i < bricks.size(); i++)
+		bricks[i].Hide();
+}
+
 void Board::SpawnBoard()
 {
 	int index = 0;

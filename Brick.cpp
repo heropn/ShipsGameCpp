@@ -15,19 +15,16 @@ Brick::Brick(int x, int y)
 
 char Brick::Spawn()
 {
-	switch (state)
-	{
-	case Brick::Hidden:
+	if (state == Hidden)
 	{
 		return char(0xFE);
-	}break;
-	case Brick::Shot:
+	}
+	else
 	{
 		if (isPartOfAShip)
 			return 'x';
 		else
 			return 'o';
-	}break;
 	}
 	return 'E';
 }
@@ -40,4 +37,14 @@ void Brick::SetPartOfAShip()
 void Brick::Shoot()
 {
 	state = Shot;
+}
+
+void Brick::Show()
+{
+	state = Showed;
+}
+
+void Brick::Hide()
+{
+	state = Hidden;
 }

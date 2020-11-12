@@ -11,4 +11,6 @@ public:
 	Board(int size);
 
 	void SpawnBoard();
+	void ShowAllBricks();
+	void HideAllBricks();
 };

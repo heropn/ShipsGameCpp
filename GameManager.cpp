@@ -50,6 +50,21 @@ GameManager::GameManager()
 		if (number == 1)
 			versusComputer = true;
 	}
+
+	std::cout << "Do you want to place your ships by yourself or you want to let it be random?" << std::endl;
+
+	int number = -1;
+	std::cout << "Automatic: Type 1	Place by yourself: Type 0" << std::endl;
+
+	while (number != 0 && number != 1)
+	{
+		std::cin >> number;
+
+		if (number != 0 && number != 1)
+			std::cout << "Wrong value\n";
+	}
+	
+	bool isAutomatic = number;
 	
 	system("CLS");
 
@@ -60,22 +75,34 @@ GameManager::GameManager()
 		if (versusComputer)
 		{
 			firstBoard = Board(boardSize);
-			SetShips(firstBoard, firstPlayerShips);
+			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
 			secondBoard = Board(boardSize);
-			SetShips(secondBoard, secondPlayersShips);
+			SetShips(secondBoard, secondPlayersShips, "", false);
 		}
 		else
 		{
 			firstBoard = Board(boardSize);
-			SetShips(firstBoard, firstPlayerShips);
+			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
 		}
 	}
 	else
 	{
 		firstBoard = Board(boardSize);
-		SetShips(firstBoard, firstPlayerShips);
+		SetShips(firstBoard, firstPlayerShips, "First Player", isAutomatic);
+
+		if (!isAutomatic)
+		{
+			system("CLS");
+			std::cout << "Next player in: ";
+			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+			{
+				std::cout << i << std::endl;
+				Wait(1);
+			}
+		}
+
 		secondBoard = Board(boardSize);
-		SetShips(secondBoard, secondPlayersShips);
+		SetShips(secondBoard, secondPlayersShips, "Second Player", isAutomatic);
 	}
 }
 
@@ -145,6 +172,11 @@ void GameManager::Play()
 			while (isGameRunning)
 			{
 				bool areValuesProper = false;
+
+				system("CLS");
+				std::cout << "You:\n";
+
+				firstBoard.SpawnBoard();
 
 				Move(firstBoard, firstPlayerShips, "You");
 
@@ -299,7 +331,7 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, std::string playe
 
 bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyBrickPtr)
 {
-	if (xBrick > boardSize || yBrick > boardSize)
+	if (xBrick > boardSize || yBrick > boardSize || xBrick < 1 || yBrick < 1)
 		return false;
 
 	for (int i = 0; i < board.bricks.size(); i++)
@@ -319,8 +351,16 @@ bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyB
 	return true;
 }
 
-void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector)
+void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, std::string playerName, bool isAutomatic)
 {
+	if (!isAutomatic)
+	{
+		system("cls");
+		board.ShowAllBricks();
+		std::cout << playerName << ":\n";
+		board.SpawnBoard();
+	}
+
 	int biggestShipSize = this->boardSize / 2;
 	int shipSize = biggestShipSize;
 
@@ -331,27 +371,262 @@ void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector)
 		{
 			for (int j = shipsNumber; j > 0; j--)
 			{
-				SetShip(board, playerShipsVector, shipSize);
+				if (isAutomatic)
+					SetShipAutomaticlly(board, playerShipsVector, shipSize);
+				else
+					SetShipByPlayer(board, playerShipsVector, shipSize, playerName);
 			}
 		}
 		else
 		{
 			for (int j = (shipsNumber / 2) - 1; j > 0; j--)
 			{
-				SetShip(board, playerShipsVector, shipSize);
+				if (isAutomatic)
+					SetShipAutomaticlly(board, playerShipsVector, shipSize);
+				else
+					SetShipByPlayer(board, playerShipsVector, shipSize, playerName);
 			}
 		}
 		shipSize--;
 	}
 
-	// TEST HACK
-	for (int i = 1; i < board.bricks.size(); i++) 
+	if (!isAutomatic)
 	{
-		//board.bricks[i].Shoot();
+		board.HideAllBricks();
+		Wait(1.0f);
 	}
 }
 
-void GameManager::SetShip(Board& board, std::vector<Ship>& playerShipsVector, int shipSize)
+void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, std::string playerName)
+{
+	if (shipSize != 1)
+	{
+		std::cout << "Do you want to place ship with size " << shipSize << " vertical or horizontal?" << std::endl;
+		std::cout << "Vertical: Type 1	Horizontal: Type 0" << std::endl;
+		int shipPlacment;
+		
+		do
+		{
+			std::cin >> shipPlacment;
+
+			if (shipPlacment != 0 && shipPlacment != 1)
+				std::cout << "Wrong Value" << std::endl;
+
+		} while (shipPlacment != 0 && shipPlacment != 1);
+
+		switch (shipPlacment)
+		{
+		case 0: // horizontal
+		{
+			Brick* brick;
+			std::vector<Brick*> chosenBricks;
+			std::vector<Brick*> bricksForShips;
+			std::cout << "Horizontal ships are placed from chosen brick to the right" << std::endl;
+
+			bool areValuesProper = true;
+			int x, y;
+
+			//check if x and y are good, check if there is a ship, check if all bricks around are available
+			do
+			{
+				if (!areValuesProper)
+					std::cout << "Wrong values, please try again" << std::endl;
+
+				chosenBricks.clear();
+				areValuesProper = true;
+
+				std::cout << "Enter X value: ";
+				std::cin >> x;
+				std::cout << "Enter Y value: ";
+				std::cin >> y;
+
+				if (x > boardSize - (shipSize - 1) || y > boardSize || x < 1 || y < 1)
+				{
+					areValuesProper = false;
+					continue;
+				}
+
+				int index = 0;
+
+				for (int i = 0; i < board.bricks.size(); i++)
+				{
+					if (board.bricks[i].x == x && board.bricks[i].y == y)
+					{
+						index = i;
+						break;
+					}
+				}
+
+				brick = &board.bricks[index];
+				chosenBricks.push_back(brick);
+
+				if (brick->isPartOfAShip || CheckIfBrickConnectToAnyShip(board, index))
+				{
+					areValuesProper = false;
+					continue;
+				}
+
+				int countBricks = shipSize - 1;
+
+				while (countBricks > 0)
+				{
+					int indexToRight = index + countBricks;
+					if (board.bricks[indexToRight].isPartOfAShip || CheckIfBrickConnectToAnyShip(board, indexToRight))
+					{
+						areValuesProper = false;
+						break;
+					}
+
+					chosenBricks.push_back(&board.bricks[indexToRight]);
+					countBricks--;
+				}
+			} while (!areValuesProper);
+
+			for (int i = 0; i < chosenBricks.size(); i++)
+			{
+				chosenBricks[i]->SetPartOfAShip();
+				bricksForShips.push_back(chosenBricks[i]);
+			}
+
+			Ship ship = Ship(bricksForShips, shipSize);
+			playerShipsVector.push_back(ship);
+		}break;
+		case 1: // vertical
+		{
+			Brick* brick;
+			std::vector<Brick*> chosenBricks;
+			std::vector<Brick*> bricksForShips;
+			std::cout << "Vertical ships are placed from chosen brick to the bottom" << std::endl;
+
+			bool areValuesProper = true;
+			int x, y;
+
+			//check if x and y are good, check if there is a ship, check if all bricks around are available
+			do
+			{
+				if (!areValuesProper)
+					std::cout << "Wrong values, please try again" << std::endl;
+
+				chosenBricks.clear();
+				areValuesProper = true;
+
+				std::cout << "Enter X value: ";
+				std::cin >> x;
+				std::cout << "Enter Y value: ";
+				std::cin >> y;
+
+				if (x > boardSize || y > boardSize - (shipSize - 1) || x < 1 || y < 1)
+				{
+					areValuesProper = false;
+					continue;
+				}
+
+				int index = 0;
+
+				for (int i = 0; i < board.bricks.size(); i++)
+				{
+					if (board.bricks[i].x == x && board.bricks[i].y == y)
+					{
+						index = i;
+						break;
+					}
+				}
+
+				brick = &board.bricks[index];
+				chosenBricks.push_back(brick);
+
+				if (brick->isPartOfAShip || CheckIfBrickConnectToAnyShip(board, index))
+				{
+					areValuesProper = false;
+					continue;
+				}
+
+				int countBricks = shipSize - 1;
+
+				while (countBricks > 0)
+				{
+					int indexBelow = index + ((this->boardSize) * countBricks);
+					if (board.bricks[indexBelow].isPartOfAShip || CheckIfBrickConnectToAnyShip(board, indexBelow))
+					{
+						areValuesProper = false;
+						break;
+					}
+
+					chosenBricks.push_back(&board.bricks[indexBelow]);
+					countBricks--;
+				}
+			} while (!areValuesProper);
+
+			for (int i = 0; i < chosenBricks.size(); i++)
+			{
+				chosenBricks[i]->SetPartOfAShip();
+				bricksForShips.push_back(chosenBricks[i]);
+			}
+
+			Ship ship = Ship(bricksForShips, shipSize);
+			playerShipsVector.push_back(ship);
+		}break;
+		}
+
+	}
+	else
+	{
+		Brick* brick = &Brick();
+		std::vector<Brick*> bricksForShips;
+		bool areValuesProper = true;
+		int x, y;
+
+		std::cout << "Where do you want to place ship with size " << shipSize << '?' << std::endl;
+
+		do
+		{
+			if (!areValuesProper)
+				std::cout << "Wrong values, please try again" << std::endl;
+
+			areValuesProper = true;
+
+			std::cout << "Enter X value: ";
+			std::cin >> x;
+			std::cout << "Enter Y value: ";
+			std::cin >> y;
+
+			if (x > boardSize || y > boardSize || x < 1 || y < 1)
+			{
+				areValuesProper = false;
+				continue;
+			}
+
+			int index = 0;
+
+			for (int i = 0; i < board.bricks.size(); i++)
+			{
+				if (board.bricks[i].x == x && board.bricks[i].y == y)
+				{
+					index = i;
+					break;
+				}
+			}
+
+			brick = &board.bricks[index];
+
+			if (brick->isPartOfAShip || CheckIfBrickConnectToAnyShip(board, index))
+				areValuesProper = false;
+
+		} while (!areValuesProper);
+
+		brick->SetPartOfAShip();
+		bricksForShips.push_back(brick);
+
+		Ship ship = Ship(bricksForShips);
+		playerShipsVector.push_back(ship);
+	}
+
+	system("cls");
+	std::cout << playerName << ":\n";
+	board.SpawnBoard();
+}
+
+void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShipsVector, int shipSize)
 {
 	std::vector<Brick*> bricksForShips;
 	std::random_device device;

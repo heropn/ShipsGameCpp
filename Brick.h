@@ -8,6 +8,7 @@ public:
 	enum BrickState
 	{
 		Hidden,
+		Showed,
 		Shot,
 	};
 
@@ -20,4 +21,6 @@ public:
 
 	void SetPartOfAShip();
 	void Shoot();
+	void Show();
+	void Hide();
 };
