@@ -8,5 +8,5 @@ public:
 	int size;
 	std::vector<Brick*> shipsBricks;
 
-	Ship(std::vector<Brick*> bricksForShip, int size = 1);
+	Ship(std::vector<Brick*>& bricksForShip, int size = 1);
 };

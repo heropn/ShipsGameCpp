@@ -1,6 +1,6 @@
 #include "Ship.h"
 
-Ship::Ship(std::vector<Brick*> bricksForShip, int size)
+Ship::Ship(std::vector<Brick*>& bricksForShip, int size)
 {
 	this->size = size;
 	shipsBricks = bricksForShip;

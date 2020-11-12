@@ -77,7 +77,7 @@ GameManager::GameManager()
 			firstBoard = Board(boardSize);
 			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
 			secondBoard = Board(boardSize);
-			SetShips(secondBoard, secondPlayersShips, "", false);
+			SetShips(secondBoard, secondPlayersShips, "", true);
 		}
 		else
 		{
@@ -94,7 +94,7 @@ GameManager::GameManager()
 		{
 			system("CLS");
 			std::cout << "Next player in: ";
-			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+			for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
 			{
 				std::cout << i << std::endl;
 				Wait(1);
@@ -108,7 +108,6 @@ GameManager::GameManager()
 
 void GameManager::Play()
 {
-	int x, y;
 	if (numberOfPlayers == 1)
 	{
 		if (versusComputer)
@@ -133,7 +132,7 @@ void GameManager::Play()
 
 				system("CLS");
 				std::cout << "Computer moves in: ";
-				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+				for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
 				{
 					std::cout << i << std::endl;
 					Wait(1);
@@ -155,7 +154,7 @@ void GameManager::Play()
 
 				system("CLS");
 				std::cout << "Your move in: ";
-				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+				for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
 				{
 					std::cout << i << std::endl;
 					Wait(1);
@@ -212,7 +211,7 @@ void GameManager::Play()
 
 			system("CLS");
 			std::cout << "Next player in: ";
-			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+			for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
 			{
 				std::cout << i << std::endl;
 				Wait(1);
@@ -231,7 +230,7 @@ void GameManager::Play()
 
 			system("CLS");
 			std::cout << "Next player in: ";
-			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
+			for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
 			{
 				std::cout << i << std::endl;
 				Wait(1);
@@ -334,7 +333,7 @@ bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyB
 	if (xBrick > boardSize || yBrick > boardSize || xBrick < 1 || yBrick < 1)
 		return false;
 
-	for (int i = 0; i < board.bricks.size(); i++)
+	for (size_t i = 0; i < board.bricks.size(); i++)
 	{
 		if (xBrick == board.bricks[i].x && yBrick == board.bricks[i].y)
 		{
@@ -448,7 +447,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 				int index = 0;
 
-				for (int i = 0; i < board.bricks.size(); i++)
+				for (size_t i = 0; i < board.bricks.size(); i++)
 				{
 					if (board.bricks[i].x == x && board.bricks[i].y == y)
 					{
@@ -482,7 +481,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				}
 			} while (!areValuesProper);
 
-			for (int i = 0; i < chosenBricks.size(); i++)
+			for (size_t i = 0; i < chosenBricks.size(); i++)
 			{
 				chosenBricks[i]->SetPartOfAShip();
 				bricksForShips.push_back(chosenBricks[i]);
@@ -490,7 +489,8 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 			Ship ship = Ship(bricksForShips, shipSize);
 			playerShipsVector.push_back(ship);
-		}break;
+		}
+		break;
 		case 1: // vertical
 		{
 			Brick* brick;
@@ -523,7 +523,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 				int index = 0;
 
-				for (int i = 0; i < board.bricks.size(); i++)
+				for (size_t i = 0; i < board.bricks.size(); i++)
 				{
 					if (board.bricks[i].x == x && board.bricks[i].y == y)
 					{
@@ -557,7 +557,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				}
 			} while (!areValuesProper);
 
-			for (int i = 0; i < chosenBricks.size(); i++)
+			for (size_t i = 0; i < chosenBricks.size(); i++)
 			{
 				chosenBricks[i]->SetPartOfAShip();
 				bricksForShips.push_back(chosenBricks[i]);
@@ -565,13 +565,14 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 			Ship ship = Ship(bricksForShips, shipSize);
 			playerShipsVector.push_back(ship);
-		}break;
+		}
+		break;
 		}
 
 	}
 	else
 	{
-		Brick* brick = &Brick();
+		Brick* brick = nullptr;
 		std::vector<Brick*> bricksForShips;
 		bool areValuesProper = true;
 		int x, y;
@@ -598,7 +599,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 			int index = 0;
 
-			for (int i = 0; i < board.bricks.size(); i++)
+			for (size_t i = 0; i < board.bricks.size(); i++)
 			{
 				if (board.bricks[i].x == x && board.bricks[i].y == y)
 				{
@@ -687,7 +688,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 
 			} while (brick->isPartOfAShip || !isEveryBrickAvaliable);
 
-			for (int i = 0; i < chosenBricks.size(); i++)
+			for (size_t i = 0; i < chosenBricks.size(); i++)
 			{
 				chosenBricks[i]->SetPartOfAShip();
 				bricksForShips.push_back(chosenBricks[i]);
@@ -735,7 +736,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 
 			} while (brick->isPartOfAShip || !isEveryBrickAvaliable);
 
-			for (int i = 0; i < chosenBricks.size(); i++)
+			for (size_t i = 0; i < chosenBricks.size(); i++)
 			{
 				chosenBricks[i]->SetPartOfAShip();
 				bricksForShips.push_back(chosenBricks[i]);
@@ -781,7 +782,7 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 {
 	int sumOfSizes = 0;
 
-	for (int i = 0; i < playerShips.size(); i++)
+	for (size_t i = 0; i < playerShips.size(); i++)
 	{
 		int bricksDestroyed = 0;
 		for (int j = 0; j < playerShips[i].size; j++)
@@ -795,7 +796,6 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 		if (playerShips[i].size == 0 && bricksDestroyed != 0)
 		{
 			std::cout << "You've destoyed a ship with size: " << playerShips[i].shipsBricks.size() << std::endl;
-			//Wait(0.5f);
 		}
 
 		sumOfSizes += playerShips[i].size;
@@ -808,10 +808,18 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 
 bool GameManager::CheckIfBrickConnectToAnyShip(Board& board, int brickIndex)
 {
-	int indexBelow = (brickIndex + this->boardSize > (this->boardSize * this->boardSize) - 1) ? brickIndex : brickIndex + this->boardSize;
-	int indexAbove = (brickIndex - this->boardSize < 0) ? brickIndex : brickIndex - this->boardSize;
-	int indexToRight = ((brickIndex + 1) % this->boardSize == 0) ? brickIndex : brickIndex + 1;
-	int indexToLeft = ((brickIndex - 1) % this->boardSize == this->boardSize - 1) || ((brickIndex - 1) < 0) ? brickIndex : brickIndex - 1;
+	int indexBelow = (brickIndex + this->boardSize > (this->boardSize * this->boardSize) - 1) 
+		? brickIndex 
+		: brickIndex + this->boardSize;
+	int indexAbove = (brickIndex - this->boardSize < 0) 
+		? brickIndex 
+		: brickIndex - this->boardSize;
+	int indexToRight = ((brickIndex + 1) % this->boardSize == 0) 
+		? brickIndex 
+		: brickIndex + 1;
+	int indexToLeft = ((brickIndex - 1) % this->boardSize == this->boardSize - 1) || ((brickIndex - 1) < 0) 
+		? brickIndex 
+		: brickIndex - 1;
 
 	int indexes[4] = { indexBelow, indexAbove, indexToRight, indexToLeft };
 

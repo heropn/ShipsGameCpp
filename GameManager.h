@@ -18,7 +18,6 @@ public:
 	GameManager();
 
 	void Play();
-
 	void SetShips(Board& board, std::vector<Ship>& playerShipsVector, std::string playerName, bool isAutomatic);
 	void SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShipsVector, int shipSize);
 	void SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, std::string playerName);

@@ -5,7 +5,7 @@
 
 int main()
 {
-	GameManager game = GameManager();
+	GameManager game;
 	game.Play();
 
 	system("pause");

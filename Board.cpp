@@ -5,7 +5,7 @@
 
 Board::Board()
 {
-	//default constructor
+	this->size = 0;
 }
 
 Board::Board(int size)
@@ -34,13 +34,13 @@ Board::Board(int size)
 
 void Board::ShowAllBricks()
 {
-	for (int i = 0; i < bricks.size(); i++)
+	for (size_t i = 0; i < bricks.size(); i++)
 		bricks[i].Show();
 }
 
 void Board::HideAllBricks()
 {
-	for (int i = 0; i < bricks.size(); i++)
+	for (size_t i = 0; i < bricks.size(); i++)
 		bricks[i].Hide();
 }
 

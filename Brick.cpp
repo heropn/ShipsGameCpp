@@ -2,7 +2,10 @@
 
 Brick::Brick()
 {
-	//default constructor
+	isPartOfAShip = false;
+	state = BrickState::Hidden;
+	x = 0;
+	y = 0;
 }
 
 Brick::Brick(int x, int y)
@@ -10,12 +13,12 @@ Brick::Brick(int x, int y)
 	this->x = x;
 	this->y = y;
 	isPartOfAShip = false;
-	state = Hidden;
+	state = BrickState::Hidden;
 }
 
 char Brick::Spawn()
 {
-	if (state == Hidden)
+	if (state == BrickState::Hidden)
 	{
 		return char(0xFE);
 	}
@@ -36,15 +39,15 @@ void Brick::SetPartOfAShip()
 
 void Brick::Shoot()
 {
-	state = Shot;
+	state = BrickState::Shot;
 }
 
 void Brick::Show()
 {
-	state = Showed;
+	state = BrickState::Showed;
 }
 
 void Brick::Hide()
 {
-	state = Hidden;
+	state = BrickState::Hidden;
 }

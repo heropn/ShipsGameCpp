@@ -5,7 +5,7 @@ public:
 	int x, y;
 	bool isPartOfAShip;
 
-	enum BrickState
+	enum class BrickState
 	{
 		Hidden,
 		Showed,
