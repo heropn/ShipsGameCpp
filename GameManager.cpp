@@ -96,50 +96,13 @@ void GameManager::Play()
 
 				firstBoard.SpawnBoard();
 
-				bool areValuesProper = false;
-				Brick shootedBrick;
-
-				do
-				{
-					do
-					{
-						areValuesProper = false;
-
-						std::cout << "Enter X value: ";
-						std::cin >> x;
-						std::cout << "Enter Y value: ";
-						std::cin >> y;
-
-						if (ShootBrick(firstBoard, x, y, shootedBrick))
-						{
-							areValuesProper = true;
-							continue;
-						}
-
-						std::cout << "Wrong values, please try again" << std::endl;
-
-					} while (!areValuesProper);
-
-					system("CLS");
-					std::cout << "You:\n";
-					firstBoard.SpawnBoard();
-
-					if (AreAllShipsDestroyed(firstPlayerShips))
-					{
-						isGameRunning = false;
-						continue;
-					}
-
-					Wait(waitShowTimeSeconds);
-
-				} while (shootedBrick.isPartOfAShip && isGameRunning);
+				Move(firstBoard, firstPlayerShips, "You");
 
 				if (!isGameRunning)
 				{
 					firstPlayerWon = true;
 					continue;
 				}
-					
 
 				system("CLS");
 				std::cout << "Computer moves in: ";
@@ -154,41 +117,8 @@ void GameManager::Play()
 				std::cout << "Computer:\n";
 
 				secondBoard.SpawnBoard();
-				do
-				{
-					do
-					{
-						
-						areValuesProper = false;
 
-						std::random_device device;
-						std::mt19937 generator(device());
-						std::uniform_int_distribution<int> distribution(1, this->boardSize);
-
-						x = distribution(generator);
-						y = distribution(generator);
-
-						if (ShootBrick(secondBoard, x, y, shootedBrick))
-						{
-							areValuesProper = true;
-							continue;
-						}
-
-					} while (!areValuesProper);
-
-					system("CLS");
-					std::cout << "Computer:\n";
-					secondBoard.SpawnBoard();
-
-					if (AreAllShipsDestroyed(secondPlayersShips))
-					{
-						isGameRunning = false;
-						continue;
-					}
-
-					Wait(waitShowTimeSeconds);
-
-				} while (shootedBrick.isPartOfAShip && isGameRunning);
+				Move(secondBoard, secondPlayersShips, "Computer", true);
 
 				if (!isGameRunning)
 				{
@@ -216,27 +146,10 @@ void GameManager::Play()
 			{
 				bool areValuesProper = false;
 
-				do
-				{
-					Brick shootedBrick;
-					areValuesProper = false;
-
-					std::cout << "Enter X value: ";
-					std::cin >> x;
-					std::cout << "Enter Y value: ";
-					std::cin >> y;
-
-					if (ShootBrick(firstBoard, x, y, shootedBrick))
-					{
-						areValuesProper = true;
-						continue;
-					}
-
-					std::cout << "Wrong values, please try again" << std::endl;
-
-				} while (!areValuesProper);
+				Move(firstBoard, firstPlayerShips, "You");
 
 				system("CLS");
+				std::cout << "You:\n";
 				firstBoard.SpawnBoard();
 
 				if (AreAllShipsDestroyed(firstPlayerShips))
@@ -260,43 +173,7 @@ void GameManager::Play()
 			
 			firstBoard.SpawnBoard();
 
-			bool areValuesProper = false;
-			Brick brick;
-
-			do
-			{
-				do
-				{
-					areValuesProper = false;
-
-					std::cout << "Enter X value: ";
-					std::cin >> x;
-					std::cout << "Enter Y value: ";
-					std::cin >> y;
-
-					if (ShootBrick(firstBoard, x, y, brick))
-					{
-						areValuesProper = true;
-						continue;
-					}
-
-					std::cout << "Wrong values, please try again" << std::endl;
-
-				} while (!areValuesProper);
-
-				system("CLS");
-				std::cout << "First Player:\n";
-				firstBoard.SpawnBoard();
-
-				if (AreAllShipsDestroyed(firstPlayerShips))
-				{
-					isGameRunning = false;
-					continue;
-				}
-
-Wait(waitShowTimeSeconds);
-
-			} while (brick.isPartOfAShip && isGameRunning);
+			Move(firstBoard, firstPlayerShips, "First Player");
 
 			if (!isGameRunning)
 				continue;
@@ -314,42 +191,8 @@ Wait(waitShowTimeSeconds);
 			std::cout << "Second Player:\n";
 
 			secondBoard.SpawnBoard();
-			Brick shootedBrick;
 
-			do
-			{
-				do
-				{
-					areValuesProper = false;
-
-					std::cout << "Enter X value: ";
-					std::cin >> x;
-					std::cout << "Enter Y value: ";
-					std::cin >> y;
-
-					if (ShootBrick(secondBoard, x, y, brick))
-					{
-						areValuesProper = true;
-						continue;
-					}
-
-					std::cout << "Wrong values, please try again" << std::endl;
-
-				} while (!areValuesProper);
-
-				system("CLS");
-				std::cout << "Second Player:\n";
-				secondBoard.SpawnBoard();
-
-				if (AreAllShipsDestroyed(secondPlayersShips))
-				{
-					isGameRunning = false;
-					continue;
-				}
-
-				Wait(waitShowTimeSeconds);
-
-			} while (brick.isPartOfAShip && isGameRunning);
+			Move(secondBoard, secondPlayersShips, "Second Player");
 
 			if (!isGameRunning)
 				continue;
@@ -369,6 +212,89 @@ Wait(waitShowTimeSeconds);
 			std::cout << "Congratulations second player won :D" << std::endl;
 	}
 
+}
+
+void GameManager::Move(Board& board, std::vector<Ship>& ships, std::string playerName, bool isComputer)
+{
+	int x, y;
+	bool areValuesProper = false;
+	Brick shootedBrick;
+
+	if (!isComputer)
+	{
+		do
+		{
+			do
+			{
+				areValuesProper = false;
+
+				std::cout << "Enter X value: ";
+				std::cin >> x;
+				std::cout << "Enter Y value: ";
+				std::cin >> y;
+
+				if (ShootBrick(board, x, y, shootedBrick))
+				{
+					areValuesProper = true;
+					continue;
+				}
+
+				std::cout << "Wrong values, please try again" << std::endl;
+
+			} while (!areValuesProper);
+
+			system("CLS");
+			std::cout << playerName << ":\n";
+			board.SpawnBoard();
+
+			if (AreAllShipsDestroyed(ships))
+			{
+				isGameRunning = false;
+				continue;
+			}
+
+			Wait(waitShowTimeSeconds);
+
+		} while (shootedBrick.isPartOfAShip && isGameRunning);
+	}
+	else
+	{
+		do
+		{
+			do
+			{
+
+				areValuesProper = false;
+
+				std::random_device device;
+				std::mt19937 generator(device());
+				std::uniform_int_distribution<int> distribution(1, this->boardSize);
+
+				x = distribution(generator);
+				y = distribution(generator);
+
+				if (ShootBrick(secondBoard, x, y, shootedBrick))
+				{
+					areValuesProper = true;
+					continue;
+				}
+
+			} while (!areValuesProper);
+
+			system("CLS");
+			std::cout << playerName << ":\n";
+			board.SpawnBoard();
+
+			if (AreAllShipsDestroyed(ships))
+			{
+				isGameRunning = false;
+				continue;
+			}
+
+			Wait(waitShowTimeSeconds);
+
+		} while (shootedBrick.isPartOfAShip && isGameRunning);
+	}
 }
 
 bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyBrickPtr)
