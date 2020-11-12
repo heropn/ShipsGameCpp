@@ -86,47 +86,60 @@ void GameManager::Play()
 	{
 		if (versusComputer)
 		{
+			bool firstPlayerWon = true;
+
 			while (isGameRunning)
 			{
 				system("CLS");
 
-				std::cout << "First Player:\n";
+				std::cout << "You:\n";
 
 				firstBoard.SpawnBoard();
 
 				bool areValuesProper = false;
+				Brick shootedBrick;
 
 				do
 				{
-					Brick brick;
-					areValuesProper = false;
-
-					std::cout << "Enter X value: ";
-					std::cin >> x;
-					std::cout << "Enter Y value: ";
-					std::cin >> y;
-
-					if (ShootBrick(firstBoard, x, y, brick))
+					do
 					{
-						areValuesProper = true;
+						areValuesProper = false;
+
+						std::cout << "Enter X value: ";
+						std::cin >> x;
+						std::cout << "Enter Y value: ";
+						std::cin >> y;
+
+						if (ShootBrick(firstBoard, x, y, shootedBrick))
+						{
+							areValuesProper = true;
+							continue;
+						}
+
+						std::cout << "Wrong values, please try again" << std::endl;
+
+					} while (!areValuesProper);
+
+					system("CLS");
+					std::cout << "You:\n";
+					firstBoard.SpawnBoard();
+
+					if (AreAllShipsDestroyed(firstPlayerShips))
+					{
+						isGameRunning = false;
 						continue;
 					}
 
-					std::cout << "Wrong values, please try again" << std::endl;
+					Wait(waitShowTimeSeconds);
 
-				} while (!areValuesProper);
+				} while (shootedBrick.isPartOfAShip && isGameRunning);
 
-				system("CLS");
-				std::cout << "You:\n";
-				firstBoard.SpawnBoard();
-
-				if (AreAllShipsDestroyed(firstPlayerShips))
+				if (!isGameRunning)
 				{
-					isGameRunning = false;
+					firstPlayerWon = true;
 					continue;
 				}
-
-				Wait(waitShowTimeSeconds);
+					
 
 				system("CLS");
 				std::cout << "Computer moves in: ";
@@ -141,38 +154,47 @@ void GameManager::Play()
 				std::cout << "Computer:\n";
 
 				secondBoard.SpawnBoard();
-
 				do
 				{
-					Brick brick;
-					areValuesProper = false;
-
-					std::random_device device;
-					std::mt19937 generator(device());
-					std::uniform_int_distribution<int> distribution(1, this->boardSize);
-
-					x = distribution(generator);
-					y = distribution(generator);
-
-					if (ShootBrick(secondBoard, x, y, brick))
+					do
 					{
-						areValuesProper = true;
+						
+						areValuesProper = false;
+
+						std::random_device device;
+						std::mt19937 generator(device());
+						std::uniform_int_distribution<int> distribution(1, this->boardSize);
+
+						x = distribution(generator);
+						y = distribution(generator);
+
+						if (ShootBrick(secondBoard, x, y, shootedBrick))
+						{
+							areValuesProper = true;
+							continue;
+						}
+
+					} while (!areValuesProper);
+
+					system("CLS");
+					std::cout << "Computer:\n";
+					secondBoard.SpawnBoard();
+
+					if (AreAllShipsDestroyed(secondPlayersShips))
+					{
+						isGameRunning = false;
 						continue;
 					}
 
-				} while (!areValuesProper);
+					Wait(waitShowTimeSeconds);
 
-				system("CLS");
-				std::cout << "Computer:\n";
-				secondBoard.SpawnBoard();
+				} while (shootedBrick.isPartOfAShip && isGameRunning);
 
-				if (AreAllShipsDestroyed(secondPlayersShips))
+				if (!isGameRunning)
 				{
-					isGameRunning = false;
+					firstPlayerWon = false;
 					continue;
 				}
-
-				Wait(waitShowTimeSeconds);
 
 				system("CLS");
 				std::cout << "Your move in: ";
@@ -183,7 +205,10 @@ void GameManager::Play()
 				}
 			}
 
-			std::cout << "Congratulations you've won :D" << std::endl;
+			if (firstPlayerWon)
+				std::cout << "Congratulations you've won :D" << std::endl;
+			else
+				std::cout << "Unfortunately computer won :(" << std::endl;
 		}
 		else
 		{
@@ -193,7 +218,7 @@ void GameManager::Play()
 
 				do
 				{
-					Brick brick;
+					Brick shootedBrick;
 					areValuesProper = false;
 
 					std::cout << "Enter X value: ";
@@ -201,7 +226,7 @@ void GameManager::Play()
 					std::cout << "Enter Y value: ";
 					std::cin >> y;
 
-					if (ShootBrick(firstBoard, x, y, brick))
+					if (ShootBrick(firstBoard, x, y, shootedBrick))
 					{
 						areValuesProper = true;
 						continue;
@@ -225,6 +250,8 @@ void GameManager::Play()
 	}
 	else
 	{
+		bool firstPlayerWon = true;
+		
 		while (isGameRunning)
 		{
 			system("CLS");
@@ -267,9 +294,9 @@ void GameManager::Play()
 					continue;
 				}
 
-				Wait(waitShowTimeSeconds);
+Wait(waitShowTimeSeconds);
 
-			} while (brick.isPartOfAShip);
+			} while (brick.isPartOfAShip && isGameRunning);
 
 			if (!isGameRunning)
 				continue;
@@ -285,7 +312,7 @@ void GameManager::Play()
 			system("CLS");
 
 			std::cout << "Second Player:\n";
-			
+
 			secondBoard.SpawnBoard();
 			Brick shootedBrick;
 
@@ -322,7 +349,7 @@ void GameManager::Play()
 
 				Wait(waitShowTimeSeconds);
 
-			} while (brick.isPartOfAShip);
+			} while (brick.isPartOfAShip && isGameRunning);
 
 			if (!isGameRunning)
 				continue;
@@ -336,7 +363,10 @@ void GameManager::Play()
 			}
 		}
 
-		std::cout << "Congratulations you've won :D" << std::endl;
+		if (firstPlayerWon)
+			std::cout << "Congratulations first player won :D" << std::endl;
+		else
+			std::cout << "Congratulations second player won :D" << std::endl;
 	}
 
 }
@@ -541,9 +571,9 @@ void GameManager::SetShip(Board& board, std::vector<Ship>& playerShipsVector, in
 	}
 }
 
-void GameManager::Wait(int seconds)
+void GameManager::Wait(float seconds)
 {
-	Sleep(seconds * 1000);
+	Sleep(seconds * 1000.0f);
 }
 
 bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
@@ -560,6 +590,13 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 		}
 
 		playerShips[i].size -= bricksDestroyed;
+
+		if (playerShips[i].size == 0 && bricksDestroyed != 0)
+		{
+			std::cout << "You've destoyed a ship with size: " << playerShips[i].shipsBricks.size() << std::endl;
+			//Wait(0.5f);
+		}
+
 		sumOfSizes += playerShips[i].size;
 	}
 	if (sumOfSizes != 0)
