@@ -1,93 +1,96 @@
 #include <iostream>
 #include <random>
+#include <sstream>
 #include <Windows.h>
 #include "GameManager.h"
 
 GameManager::GameManager()
 {
-	std::cout << "How big should be the board (even number reccomended and has to be between 4 and 8): ";
-	int boardSize = 0;
+	std::cout << "How big should be the board (number has to be between 4 and 8): ";
+	std::string boardSize = "0";
 
 	std::cin >> boardSize;
 
-	while (boardSize < 4 || boardSize > 8)
+	while (boardSize < "4" || boardSize > "8")
 	{
-		if (boardSize < 4 || boardSize > 8)
+		if (boardSize < "4" || boardSize > "8")
 			std::cout << "Wrong value\n";
 
 		std::cin >> boardSize;
 	}
 
-	this->boardSize = boardSize;
+	std::stringstream(boardSize) >> this->boardSize;
 
 	std::cout << "How many players (1 or 2): ";
-	int numberOfPlayers = 0;
+	std::string numberOfPlayersStr = "0";
 	
-	while (numberOfPlayers != 1 && numberOfPlayers != 2)
+	while (numberOfPlayersStr != "1" && numberOfPlayersStr != "2")
 	{
-		std::cin >> numberOfPlayers;
+		std::cin >> numberOfPlayersStr;
 
-		if (numberOfPlayers != 1 && numberOfPlayers != 2)
+		if (numberOfPlayersStr != "1" && numberOfPlayersStr != "2")
 			std::cout << "Wrong value\n";
 	}
 
-	this->numberOfPlayers = numberOfPlayers;
+	std::stringstream(numberOfPlayersStr) >> this->numberOfPlayers;
 
-	if (numberOfPlayers == 1)
+	if (this->numberOfPlayers == 1)
 	{
-		std::cout << "Do you wish to play 2-player game vs computer?" << std::endl << "Yes: type 1	No: type 0" << std::endl;
-		int number = -1;
+		std::cout << "Do you wish to play vs computer?" << std::endl << "Yes: type 1	No: type 0" << std::endl;
+		std::string numberStr = "-";
 		versusComputer = false;
 
-		while (number != 0 && number != 1)
+		while (numberStr != "0" && numberStr != "1")
 		{
-			std::cin >> number;
+			std::cin >> numberStr;
 
-			if (number != 0 && number != 1)
+			if (numberStr != "0" && numberStr != "1")
 				std::cout << "Wrong value\n";
 		}
 		
-		if (number == 1)
+		if (numberStr == "1")
 			versusComputer = true;
 	}
 
 	std::cout << "Do you want to place your ships by yourself or you want to let it be random?" << std::endl;
 
-	int number = -1;
+	std::string numberStr = "-";
 	std::cout << "Automatic: Type 1	Place by yourself: Type 0" << std::endl;
 
-	while (number != 0 && number != 1)
+	while (numberStr != "0" && numberStr != "1")
 	{
-		std::cin >> number;
+		std::cin >> numberStr;
 
-		if (number != 0 && number != 1)
+		if (numberStr != "0" && numberStr != "1")
 			std::cout << "Wrong value\n";
 	}
 	
+	int number;
+	std::stringstream(numberStr) >> number;
 	bool isAutomatic = number;
 	
 	system("CLS");
 
 	isGameRunning = true;
 
-	if (numberOfPlayers == 1)
+	if (this->numberOfPlayers == 1)
 	{
 		if (versusComputer)
 		{
-			firstBoard = Board(boardSize);
+			firstBoard = Board(this->boardSize);
 			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
-			secondBoard = Board(boardSize);
+			secondBoard = Board(this->boardSize);
 			SetShips(secondBoard, secondPlayersShips, "", true);
 		}
 		else
 		{
-			firstBoard = Board(boardSize);
+			firstBoard = Board(this->boardSize);
 			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
 		}
 	}
 	else
 	{
-		firstBoard = Board(boardSize);
+		firstBoard = Board(this->boardSize);
 		SetShips(firstBoard, firstPlayerShips, "First Player", isAutomatic);
 
 		if (!isAutomatic)
@@ -101,7 +104,7 @@ GameManager::GameManager()
 			}
 		}
 
-		secondBoard = Board(boardSize);
+		secondBoard = Board(this->boardSize);
 		SetShips(secondBoard, secondPlayersShips, "Second Player", isAutomatic);
 	}
 }
@@ -243,13 +246,15 @@ void GameManager::Play()
 			std::cout << "Congratulations second player won :D" << std::endl;
 	}
 
+	Wait(3.0f);
 }
 
-void GameManager::Move(Board& board, std::vector<Ship>& ships, std::string playerName, bool isComputer)
+void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string& playerName, bool isComputer)
 {
 	int x, y;
+	std::string xStr, yStr;
 	bool areValuesProper = false;
-	Brick shootedBrick;
+	Brick* shootedBrick = nullptr;
 
 	if (!isComputer)
 	{
@@ -260,9 +265,12 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, std::string playe
 				areValuesProper = false;
 
 				std::cout << "Enter X value: ";
-				std::cin >> x;
+				std::cin >> xStr;
 				std::cout << "Enter Y value: ";
-				std::cin >> y;
+				std::cin >> yStr;
+
+				std::stringstream(xStr) >> x;
+				std::stringstream(yStr) >> y;
 
 				if (ShootBrick(board, x, y, shootedBrick))
 				{
@@ -286,7 +294,7 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, std::string playe
 
 			Wait(waitShowTimeSeconds);
 
-		} while (shootedBrick.isPartOfAShip && isGameRunning);
+		} while (shootedBrick->isPartOfAShip && isGameRunning);
 	}
 	else
 	{
@@ -324,33 +332,29 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, std::string playe
 
 			Wait(waitShowTimeSeconds);
 
-		} while (shootedBrick.isPartOfAShip && isGameRunning);
+		} while (shootedBrick->isPartOfAShip && isGameRunning);
 	}
 }
 
-bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick& emptyBrickPtr)
+bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick*& emptyBrickPtr)
 {
 	if (xBrick > boardSize || yBrick > boardSize || xBrick < 1 || yBrick < 1)
 		return false;
 
-	for (size_t i = 0; i < board.bricks.size(); i++)
-	{
-		if (xBrick == board.bricks[i].x && yBrick == board.bricks[i].y)
-		{
-			if (board.bricks[i].state == Brick::BrickState::Shot)
-			{
-				return false;
-			}
 
-			board.bricks[i].Shoot();
-			emptyBrickPtr = board.bricks[i];
-			return true;
-		}
+	int index = xBrick + ((yBrick - 1) * boardSize) - 1;
+
+	if (board.bricks[index].state == Brick::BrickState::Shot)
+	{
+		return false;
 	}
+
+	board.bricks[index].Shoot();
+	emptyBrickPtr = &board.bricks[index];
 	return true;
 }
 
-void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, std::string playerName, bool isAutomatic)
+void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, const std::string& playerName, bool isAutomatic)
 {
 	if (!isAutomatic)
 	{
@@ -396,22 +400,25 @@ void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, s
 	}
 }
 
-void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, std::string playerName)
+void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, const std::string& playerName)
 {
 	if (shipSize != 1)
 	{
 		std::cout << "Do you want to place ship with size " << shipSize << " vertical or horizontal?" << std::endl;
 		std::cout << "Vertical: Type 1	Horizontal: Type 0" << std::endl;
 		int shipPlacment;
+		std::string shipPlacementStr;
 		
 		do
 		{
-			std::cin >> shipPlacment;
+			std::cin >> shipPlacementStr;
 
-			if (shipPlacment != 0 && shipPlacment != 1)
+			if (shipPlacementStr != "0" && shipPlacementStr != "1")
 				std::cout << "Wrong Value" << std::endl;
 
-		} while (shipPlacment != 0 && shipPlacment != 1);
+		} while (shipPlacementStr != "0" && shipPlacementStr != "1");
+
+		std::stringstream(shipPlacementStr) >> shipPlacment;
 
 		switch (shipPlacment)
 		{
@@ -420,6 +427,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 			Brick* brick;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
+			std::string xStr, yStr;
 			std::cout << "Horizontal ships are placed from chosen brick to the right" << std::endl;
 
 			bool areValuesProper = true;
@@ -434,10 +442,14 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				chosenBricks.clear();
 				areValuesProper = true;
 
+
 				std::cout << "Enter X value: ";
-				std::cin >> x;
+				std::cin >> xStr;
 				std::cout << "Enter Y value: ";
-				std::cin >> y;
+				std::cin >> yStr;
+
+				std::stringstream(xStr) >> x;
+				std::stringstream(yStr) >> y;
 
 				if (x > boardSize - (shipSize - 1) || y > boardSize || x < 1 || y < 1)
 				{
@@ -445,16 +457,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 					continue;
 				}
 
-				int index = 0;
-
-				for (size_t i = 0; i < board.bricks.size(); i++)
-				{
-					if (board.bricks[i].x == x && board.bricks[i].y == y)
-					{
-						index = i;
-						break;
-					}
-				}
+				int index = x + ((y - 1) * boardSize) - 1;
 
 				brick = &board.bricks[index];
 				chosenBricks.push_back(brick);
@@ -496,6 +499,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 			Brick* brick;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
+			std::string xStr, yStr;
 			std::cout << "Vertical ships are placed from chosen brick to the bottom" << std::endl;
 
 			bool areValuesProper = true;
@@ -511,9 +515,12 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				areValuesProper = true;
 
 				std::cout << "Enter X value: ";
-				std::cin >> x;
+				std::cin >> xStr;
 				std::cout << "Enter Y value: ";
-				std::cin >> y;
+				std::cin >> yStr;
+
+				std::stringstream(xStr) >> x;
+				std::stringstream(yStr) >> y;
 
 				if (x > boardSize || y > boardSize - (shipSize - 1) || x < 1 || y < 1)
 				{
@@ -521,16 +528,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 					continue;
 				}
 
-				int index = 0;
-
-				for (size_t i = 0; i < board.bricks.size(); i++)
-				{
-					if (board.bricks[i].x == x && board.bricks[i].y == y)
-					{
-						index = i;
-						break;
-					}
-				}
+				int index = x + ((y - 1) * boardSize) - 1;
 
 				brick = &board.bricks[index];
 				chosenBricks.push_back(brick);
@@ -574,6 +572,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 	{
 		Brick* brick = nullptr;
 		std::vector<Brick*> bricksForShips;
+		std::string xStr, yStr;
 		bool areValuesProper = true;
 		int x, y;
 
@@ -587,9 +586,12 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 			areValuesProper = true;
 
 			std::cout << "Enter X value: ";
-			std::cin >> x;
+			std::cin >> xStr;
 			std::cout << "Enter Y value: ";
-			std::cin >> y;
+			std::cin >> yStr;
+
+			std::stringstream(xStr) >> x;
+			std::stringstream(yStr) >> y;
 
 			if (x > boardSize || y > boardSize || x < 1 || y < 1)
 			{
@@ -597,16 +599,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				continue;
 			}
 
-			int index = 0;
-
-			for (size_t i = 0; i < board.bricks.size(); i++)
-			{
-				if (board.bricks[i].x == x && board.bricks[i].y == y)
-				{
-					index = i;
-					break;
-				}
-			}
+			int index = x + ((y - 1) * boardSize) - 1;
 
 			brick = &board.bricks[index];
 
