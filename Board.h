@@ -7,12 +7,12 @@ public:
 	std::vector<Brick> bricks;
 
 	Board();
-	Board(int size);
+	Board(size_t size);
 
 	void SpawnBoard();
 	void ShowAllBricks();
 	void HideAllBricks();
 
 private:
-	int size;
+	size_t size;
 };

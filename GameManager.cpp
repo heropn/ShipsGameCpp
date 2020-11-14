@@ -251,9 +251,9 @@ void GameManager::Play()
 
 void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string& playerName, bool isComputer)
 {
-	int x, y;
+	int x = 0, y = 0;
 	std::string xStr, yStr;
-	bool areValuesProper = false;
+	bool areValuesProper = true;
 	Brick* shootedBrick = nullptr;
 
 	if (!isComputer)
@@ -262,23 +262,57 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string
 		{
 			do
 			{
+				if (!areValuesProper)
+					std::cout << "Wrong values, please try again" << std::endl;
+
 				areValuesProper = false;
+				std::string input;
 
-				std::cout << "Enter X value: ";
-				std::cin >> xStr;
-				std::cout << "Enter Y value: ";
-				std::cin >> yStr;
+				std::cout << "Enter brick coordinates: ";
+				std::cin >> input;
 
-				std::stringstream(xStr) >> x;
-				std::stringstream(yStr) >> y;
+				if (input.size() != 2)
+					continue;
+
+				if (isdigit(input[0]) && isalpha(input[1]))
+				{
+					y = input[0] - '0';
+					int diffrence = 'A' - 'a';
+
+					if (isupper(input[1]))
+					{
+						input[1] -= diffrence;
+					}
+
+					if (input[1] < 'a' || input[1] > 'a' + boardSize - 1 || y < 1 || y > boardSize)
+					{
+						continue;
+					}
+
+					x = input[1] + 1 - 'a';
+				}
+				else if ((isdigit(input[1]) && isalpha(input[0])))
+				{
+					y = input[1] - '0';
+					int diffrence = 'A' - 'a';
+
+					if (isupper(input[0]))
+					{
+						input[0] -= diffrence;
+					}
+
+					if (input[0] < 'a' || input[0] > 'a' + boardSize - 1 || y < 1 || y > boardSize)
+					{
+						continue;
+					}
+
+					x = input[0] + 1 - 'a';
+				}
 
 				if (ShootBrick(board, x, y, shootedBrick))
 				{
 					areValuesProper = true;
-					continue;
-				}
-
-				std::cout << "Wrong values, please try again" << std::endl;
+				}	
 
 			} while (!areValuesProper);
 

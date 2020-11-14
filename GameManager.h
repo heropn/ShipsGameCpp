@@ -13,8 +13,8 @@ private:
 	Board firstBoard, secondBoard;
 	bool isGameRunning = false;
 	bool versusComputer = false;
-	int boardSize;
-	int numberOfPlayers;
+	size_t boardSize;
+	size_t numberOfPlayers;
 	float waitShowTimeSeconds = 1.0f;
 	float waitBetweenPlayersSeconds = 1.0f;
 	std::vector<Ship> firstPlayerShips, secondPlayersShips;
