@@ -4,7 +4,6 @@
 class Board
 {
 public:
-	int size;
 	std::vector<Brick> bricks;
 
 	Board();
@@ -13,4 +12,7 @@ public:
 	void SpawnBoard();
 	void ShowAllBricks();
 	void HideAllBricks();
+
+private:
+	int size;
 };

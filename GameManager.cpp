@@ -778,17 +778,16 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 	for (size_t i = 0; i < playerShips.size(); i++)
 	{
 		int bricksDestroyed = 0;
-		for (int j = 0; j < playerShips[i].size; j++)
+		for (size_t j = 0; j < playerShips[i].shipsBricks.size() ; j++)
 		{
 			if (playerShips[i].shipsBricks[j]->state == Brick::BrickState::Shot)
 				bricksDestroyed++;
 		}
 
-		playerShips[i].size -= bricksDestroyed;
-
-		if (playerShips[i].size == 0 && bricksDestroyed != 0)
+		if (playerShips[i].size == bricksDestroyed)
 		{
 			std::cout << "You've destoyed a ship with size: " << playerShips[i].shipsBricks.size() << std::endl;
+			playerShips[i].size = 0;
 		}
 
 		sumOfSizes += playerShips[i].size;

@@ -18,7 +18,7 @@ Board::Board(int size)
 		for (int j = 0; j < size + 1; j++)
 		{
 			if (i == 0 && j < size)
-				std::cout << " " << j + 1;
+				std::cout << " " << char('A' + j + 1);
 			else if (j == 0 && i != 0)
 				std::cout << i << " ";
 			else if (i != 0)

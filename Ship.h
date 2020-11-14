@@ -5,8 +5,8 @@
 class Ship
 {
 public:
-	int size;
 	std::vector<Brick*> shipsBricks;
+	int size;
 
 	Ship(std::vector<Brick*>& bricksForShip, int size = 1);
 };
