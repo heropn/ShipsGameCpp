@@ -13,7 +13,7 @@ int main()
 
 		system("CLS");
 
-		std::cout << "Do you want to play again?" << std::endl;
+		std::cout << "Do you want to play again?" << std::endl << "Yes: type 1	No: type 0" << std::endl;
 		std::string input = "-";
 
 		while (input != "1" && input != "0")

@@ -45,7 +45,7 @@ GameManager::GameManager()
 			std::cin >> numberStr;
 
 			if (numberStr != "0" && numberStr != "1")
-				std::cout << "Wrong value\n";
+				std::cout << "Wrong input\n";
 		}
 		
 		if (numberStr == "1")
@@ -78,8 +78,8 @@ GameManager::GameManager()
 		if (versusComputer)
 		{
 			firstBoard = Board(this->boardSize);
-			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
 			secondBoard = Board(this->boardSize);
+			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
 			SetShips(secondBoard, secondPlayersShips, "", true);
 		}
 		else
@@ -91,6 +91,7 @@ GameManager::GameManager()
 	else
 	{
 		firstBoard = Board(this->boardSize);
+		secondBoard = Board(this->boardSize);
 		SetShips(firstBoard, firstPlayerShips, "First Player", isAutomatic);
 
 		if (!isAutomatic)
@@ -104,7 +105,6 @@ GameManager::GameManager()
 			}
 		}
 
-		secondBoard = Board(this->boardSize);
 		SetShips(secondBoard, secondPlayersShips, "Second Player", isAutomatic);
 	}
 }
@@ -123,9 +123,9 @@ void GameManager::Play()
 
 				std::cout << "You:\n";
 
-				firstBoard.SpawnBoard();
+				secondBoard.SpawnBoard();
 
-				Move(firstBoard, firstPlayerShips, "You");
+				Move(secondBoard, secondPlayersShips, "You");
 
 				if (!isGameRunning)
 				{
@@ -145,9 +145,10 @@ void GameManager::Play()
 
 				std::cout << "Computer:\n";
 
-				secondBoard.SpawnBoard();
+				firstBoard.SpawnBoard();
+				Wait(0.5f);
 
-				Move(secondBoard, secondPlayersShips, "Computer", true);
+				Move(firstBoard, firstPlayerShips, "Computer", true);
 
 				if (!isGameRunning)
 				{
@@ -205,9 +206,9 @@ void GameManager::Play()
 
 			std::cout << "First Player:\n";
 			
-			firstBoard.SpawnBoard();
+			secondBoard.SpawnBoard();
 
-			Move(firstBoard, firstPlayerShips, "First Player");
+			Move(secondBoard, secondPlayersShips, "First Player");
 
 			if (!isGameRunning)
 				continue;
@@ -224,9 +225,9 @@ void GameManager::Play()
 
 			std::cout << "Second Player:\n";
 
-			secondBoard.SpawnBoard();
+			firstBoard.SpawnBoard();
 
-			Move(secondBoard, secondPlayersShips, "Second Player");
+			Move(firstBoard, firstPlayerShips, "Second Player");
 
 			if (!isGameRunning)
 				continue;
@@ -367,7 +368,7 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string
 				x = distribution(generator);
 				y = distribution(generator);
 
-				if (ShootBrick(secondBoard, x, y, shootedBrick))
+				if (ShootBrick(board, x, y, shootedBrick))
 				{
 					areValuesProper = true;
 					continue;
