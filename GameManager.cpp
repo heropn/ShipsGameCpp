@@ -249,6 +249,67 @@ void GameManager::Play()
 	Wait(3.0f);
 }
 
+void GameManager::GetCoordinates(int& x, int& y)
+{
+	bool areValuesProper = true;
+	do
+	{
+		if (!areValuesProper)
+			std::cout << "Wrong values, please try again" << std::endl;
+
+		areValuesProper = false;
+		std::string input;
+
+		std::cout << "Enter brick coordinates: ";
+		std::cin >> input;
+
+		if (input.size() != 2)
+			continue;
+
+		if (isdigit(input[0]) && isalpha(input[1]))
+		{
+			y = input[0] - '0';
+			int diffrence = 'A' - 'a';
+
+			if (isupper(input[1]))
+			{
+				input[1] -= diffrence;
+			}
+
+			if (input[1] < 'a' || input[1] > 'a' + boardSize - 1 || y < 1 || y > boardSize)
+			{
+				continue;
+			}
+
+			x = input[1] + 1 - 'a';
+		}
+		else if ((isdigit(input[1]) && isalpha(input[0])))
+		{
+			y = input[1] - '0';
+			int diffrence = 'A' - 'a';
+
+			if (isupper(input[0]))
+			{
+				input[0] -= diffrence;
+			}
+
+			if (input[0] < 'a' || input[0] > 'a' + boardSize - 1 || y < 1 || y > boardSize)
+			{
+				continue;
+			}
+
+			x = input[0] + 1 - 'a';
+		}
+		else
+		{
+			continue;
+		}
+
+		areValuesProper = true;
+
+	} while (!areValuesProper);
+}
+
 void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string& playerName, bool isComputer)
 {
 	int x = 0, y = 0;
@@ -266,48 +327,8 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string
 					std::cout << "Wrong values, please try again" << std::endl;
 
 				areValuesProper = false;
-				std::string input;
 
-				std::cout << "Enter brick coordinates: ";
-				std::cin >> input;
-
-				if (input.size() != 2)
-					continue;
-
-				if (isdigit(input[0]) && isalpha(input[1]))
-				{
-					y = input[0] - '0';
-					int diffrence = 'A' - 'a';
-
-					if (isupper(input[1]))
-					{
-						input[1] -= diffrence;
-					}
-
-					if (input[1] < 'a' || input[1] > 'a' + boardSize - 1 || y < 1 || y > boardSize)
-					{
-						continue;
-					}
-
-					x = input[1] + 1 - 'a';
-				}
-				else if ((isdigit(input[1]) && isalpha(input[0])))
-				{
-					y = input[1] - '0';
-					int diffrence = 'A' - 'a';
-
-					if (isupper(input[0]))
-					{
-						input[0] -= diffrence;
-					}
-
-					if (input[0] < 'a' || input[0] > 'a' + boardSize - 1 || y < 1 || y > boardSize)
-					{
-						continue;
-					}
-
-					x = input[0] + 1 - 'a';
-				}
+				GetCoordinates(x, y);
 
 				if (ShootBrick(board, x, y, shootedBrick))
 				{
@@ -461,7 +482,6 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 			Brick* brick;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
-			std::string xStr, yStr;
 			std::cout << "Horizontal ships are placed from chosen brick to the right" << std::endl;
 
 			bool areValuesProper = true;
@@ -476,20 +496,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				chosenBricks.clear();
 				areValuesProper = true;
 
-
-				std::cout << "Enter X value: ";
-				std::cin >> xStr;
-				std::cout << "Enter Y value: ";
-				std::cin >> yStr;
-
-				std::stringstream(xStr) >> x;
-				std::stringstream(yStr) >> y;
-
-				if (x > boardSize - (shipSize - 1) || y > boardSize || x < 1 || y < 1)
-				{
-					areValuesProper = false;
-					continue;
-				}
+				GetCoordinates(x, y);
 
 				int index = x + ((y - 1) * boardSize) - 1;
 
@@ -548,19 +555,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				chosenBricks.clear();
 				areValuesProper = true;
 
-				std::cout << "Enter X value: ";
-				std::cin >> xStr;
-				std::cout << "Enter Y value: ";
-				std::cin >> yStr;
-
-				std::stringstream(xStr) >> x;
-				std::stringstream(yStr) >> y;
-
-				if (x > boardSize || y > boardSize - (shipSize - 1) || x < 1 || y < 1)
-				{
-					areValuesProper = false;
-					continue;
-				}
+				GetCoordinates(x, y);
 
 				int index = x + ((y - 1) * boardSize) - 1;
 
@@ -619,19 +614,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 			areValuesProper = true;
 
-			std::cout << "Enter X value: ";
-			std::cin >> xStr;
-			std::cout << "Enter Y value: ";
-			std::cin >> yStr;
-
-			std::stringstream(xStr) >> x;
-			std::stringstream(yStr) >> y;
-
-			if (x > boardSize || y > boardSize || x < 1 || y < 1)
-			{
-				areValuesProper = false;
-				continue;
-			}
+			GetCoordinates(x, y);
 
 			int index = x + ((y - 1) * boardSize) - 1;
 
