@@ -148,7 +148,7 @@ void GameManager::Play()
 				firstBoard.SpawnBoard();
 				Wait(0.5f);
 
-				Move(firstBoard, firstPlayerShips, "Computer", true);
+				MoveComputer(firstBoard, firstPlayerShips, "Computer");
 
 				if (!isGameRunning)
 				{
@@ -311,85 +311,86 @@ void GameManager::GetCoordinates(int& x, int& y)
 	} while (!areValuesProper);
 }
 
-void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string& playerName, bool isComputer)
+void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string& playerName)
 {
 	int x = 0, y = 0;
-	std::string xStr, yStr;
 	bool areValuesProper = true;
 	Brick* shootedBrick = nullptr;
 
-	if (!isComputer)
+	do
 	{
 		do
 		{
-			do
+			if (!areValuesProper)
+				std::cout << "Wrong values, please try again" << std::endl;
+
+			areValuesProper = false;
+
+			GetCoordinates(x, y);
+
+			if (ShootBrick(board, x, y, shootedBrick))
 			{
-				if (!areValuesProper)
-					std::cout << "Wrong values, please try again" << std::endl;
+				areValuesProper = true;
+			}	
 
-				areValuesProper = false;
+		} while (!areValuesProper);
 
-				GetCoordinates(x, y);
+		system("CLS");
+		std::cout << playerName << ":\n";
+		board.SpawnBoard();
 
-				if (ShootBrick(board, x, y, shootedBrick))
-				{
-					areValuesProper = true;
-				}	
+		if (AreAllShipsDestroyed(ships))
+		{
+			isGameRunning = false;
+			continue;
+		}
 
-			} while (!areValuesProper);
+		Wait(waitShowTimeSeconds);
 
-			system("CLS");
-			std::cout << playerName << ":\n";
-			board.SpawnBoard();
+	} while (shootedBrick->isPartOfAShip && isGameRunning);
+}
 
-			if (AreAllShipsDestroyed(ships))
-			{
-				isGameRunning = false;
-				continue;
-			}
+void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std::string& computerName)
+{
+	int x = 0, y = 0;
+	bool areValuesProper = true;
+	Brick* shootedBrick = nullptr;
 
-			Wait(waitShowTimeSeconds);
-
-		} while (shootedBrick->isPartOfAShip && isGameRunning);
-	}
-	else
+	do
 	{
 		do
 		{
-			do
+
+			areValuesProper = false;
+
+			std::random_device device;
+			std::mt19937 generator(device());
+			std::uniform_int_distribution<int> distribution(1, this->boardSize);
+
+			x = distribution(generator);
+			y = distribution(generator);
+
+			if (ShootBrick(board, x, y, shootedBrick))
 			{
-
-				areValuesProper = false;
-
-				std::random_device device;
-				std::mt19937 generator(device());
-				std::uniform_int_distribution<int> distribution(1, this->boardSize);
-
-				x = distribution(generator);
-				y = distribution(generator);
-
-				if (ShootBrick(board, x, y, shootedBrick))
-				{
-					areValuesProper = true;
-					continue;
-				}
-
-			} while (!areValuesProper);
-
-			system("CLS");
-			std::cout << playerName << ":\n";
-			board.SpawnBoard();
-
-			if (AreAllShipsDestroyed(ships))
-			{
-				isGameRunning = false;
+				areValuesProper = true;
 				continue;
 			}
 
-			Wait(waitShowTimeSeconds);
+		} while (!areValuesProper);
 
-		} while (shootedBrick->isPartOfAShip && isGameRunning);
-	}
+		system("CLS");
+		std::cout << computerName << ":\n";
+		board.SpawnBoard();
+
+		if (AreAllShipsDestroyed(ships))
+		{
+			isGameRunning = false;
+			continue;
+		}
+
+		Wait(waitShowTimeSeconds);
+
+	} while (shootedBrick->isPartOfAShip && isGameRunning);
 }
 
 bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick*& emptyBrickPtr)
@@ -480,7 +481,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 		{
 		case 0: // horizontal
 		{
-			Brick* brick;
+			Brick* brick = nullptr;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
 			std::cout << "Horizontal ships are placed from chosen brick to the right" << std::endl;
@@ -498,6 +499,12 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				areValuesProper = true;
 
 				GetCoordinates(x, y);
+
+				if (x > boardSize - shipSize + 1)
+				{
+					areValuesProper = false;
+					continue;
+				}
 
 				int index = x + ((y - 1) * boardSize) - 1;
 
@@ -538,7 +545,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 		break;
 		case 1: // vertical
 		{
-			Brick* brick;
+			Brick* brick = nullptr;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
 			std::string xStr, yStr;
@@ -557,6 +564,12 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				areValuesProper = true;
 
 				GetCoordinates(x, y);
+
+				if (y > boardSize - shipSize + 1)
+				{
+					areValuesProper = false;
+					continue;
+				}
 
 				int index = x + ((y - 1) * boardSize) - 1;
 

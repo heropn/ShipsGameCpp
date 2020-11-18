@@ -23,7 +23,8 @@ private:
 	void SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShipsVector, int shipSize);
 	void SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, const std::string& playerName);
 	void Wait(float seconds);
-	void Move(Board& board, std::vector<Ship>& ships, const std::string& playerName, bool isComputer = false);
+	void Move(Board& board, std::vector<Ship>& ships, const std::string& playerName);
+	void MoveComputer(Board& board, std::vector<Ship>& ships, const std::string& computerName);
 	void GetCoordinates(int& x, int& y);
 
 	bool ShootBrick(Board& board, int xBrick, int yBrick, Brick*& emptyBrickPtr);
