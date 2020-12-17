@@ -6,7 +6,6 @@ class Ship
 {
 public:
 	std::vector<Brick*> shipsBricks;
-	int size;
-
-	Ship(std::vector<Brick*>& bricksForShip, int size = 1);
+	size_t size;
+	Ship(std::vector<Brick*>& bricksForShip, size_t size = 1);
 };

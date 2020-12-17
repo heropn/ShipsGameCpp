@@ -15,14 +15,14 @@ private:
 	bool versusComputer = false;
 	int boardSize;
 	int numberOfPlayers;
-	float waitShowTimeSeconds = 1.0f;
-	float waitBetweenPlayersSeconds = 1.0f;
+	int  waitShowTimeSeconds = 1;
+	int waitBetweenPlayersSeconds = 1;
 	std::vector<Ship> firstPlayerShips, secondPlayersShips;
 
 	void SetShips(Board& board, std::vector<Ship>& playerShipsVector, const std::string& playerName, bool isAutomatic);
 	void SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShipsVector, int shipSize);
 	void SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVector, int shipSize, const std::string& playerName);
-	void Wait(float seconds);
+	void Wait(int seconds);
 	void Move(Board& board, std::vector<Ship>& ships, const std::string& playerName);
 	void MoveComputer(Board& board, std::vector<Ship>& ships, const std::string& computerName);
 	void GetCoordinates(int& x, int& y);

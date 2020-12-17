@@ -98,7 +98,7 @@ GameManager::GameManager()
 		{
 			system("CLS");
 			std::cout << "Next player in: ";
-			for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
+			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 			{
 				std::cout << i << std::endl;
 				Wait(1);
@@ -135,7 +135,7 @@ void GameManager::Play()
 
 				system("CLS");
 				std::cout << "Computer moves in: ";
-				for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
+				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 				{
 					std::cout << i << std::endl;
 					Wait(1);
@@ -146,7 +146,7 @@ void GameManager::Play()
 				std::cout << "Computer:\n";
 
 				firstBoard.SpawnBoard();
-				Wait(0.5f);
+				Wait(1);
 
 				MoveComputer(firstBoard, firstPlayerShips, "Computer");
 
@@ -158,7 +158,7 @@ void GameManager::Play()
 
 				system("CLS");
 				std::cout << "Your move in: ";
-				for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
+				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 				{
 					std::cout << i << std::endl;
 					Wait(1);
@@ -215,7 +215,7 @@ void GameManager::Play()
 
 			system("CLS");
 			std::cout << "Next player in: ";
-			for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
+			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 			{
 				std::cout << i << std::endl;
 				Wait(1);
@@ -234,7 +234,7 @@ void GameManager::Play()
 
 			system("CLS");
 			std::cout << "Next player in: ";
-			for (int i = int(waitBetweenPlayersSeconds); i > 0; i--)
+			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 			{
 				std::cout << i << std::endl;
 				Wait(1);
@@ -247,7 +247,7 @@ void GameManager::Play()
 			std::cout << "Congratulations second player won :D" << std::endl;
 	}
 
-	Wait(3.0f);
+	Wait(3);
 }
 
 void GameManager::GetCoordinates(int& x, int& y)
@@ -453,7 +453,7 @@ void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, c
 	if (!isAutomatic)
 	{
 		board.HideAllBricks();
-		Wait(1.0f);
+		Wait(1);
 	}
 }
 
@@ -797,9 +797,9 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 	}
 }
 
-void GameManager::Wait(float seconds)
+void GameManager::Wait(int seconds)
 {
-	Sleep(seconds * 1000.0f);
+	Sleep(seconds * 1000);
 }
 
 bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)

@@ -2,7 +2,7 @@
 class Brick
 {
 public:
-	int x, y;
+	unsigned int x, y;
 	bool isPartOfAShip;
 
 	enum class BrickState
@@ -15,7 +15,7 @@ public:
 	BrickState state;
 
 	Brick();
-	Brick(int x, int y);
+	Brick(unsigned int x, unsigned int y);
 
 	char Spawn();
 

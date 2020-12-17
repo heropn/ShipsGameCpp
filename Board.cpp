@@ -8,14 +8,14 @@ Board::Board()
 	this->size = 0;
 }
 
-Board::Board(int size)
+Board::Board(size_t size)
 {
 	this->size = size;
 
 	std::cout << " ";
-	for (int i = 0; i < size + 1; i++)
+	for (size_t i = 0; i < size + 1; i++)
 	{
-		for (int j = 0; j < size + 1; j++)
+		for (size_t j = 0; j < size + 1; j++)
 		{
 			if (i != 0)
 			{
@@ -42,9 +42,9 @@ void Board::SpawnBoard()
 {
 	int index = 0;
 	std::cout << " ";
-	for (int i = 0; i < size + 1; i++)
+	for (size_t i = 0; i < size + 1; i++)
 	{
-		for (int j = 0; j < size + 1; j++)
+		for (size_t j = 0; j < size + 1; j++)
 		{
 			if (i == 0 && j < size)
 				std::cout << " " << char('A' + j);
