@@ -5,14 +5,14 @@ public:
 	unsigned int x, y;
 	bool isPartOfAShip;
 
-	enum class BrickState
+	enum class State
 	{
 		Hidden,
 		Showed,
 		Shot,
 	};
 
-	BrickState state;
+	State state;
 
 	Brick();
 	Brick(unsigned int x, unsigned int y);

@@ -360,7 +360,6 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 	{
 		do
 		{
-
 			areValuesProper = false;
 
 			std::random_device device;
@@ -370,6 +369,32 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 			x = distribution(generator);
 			y = distribution(generator);
 
+			Ship* ship = nullptr;
+
+			if (lastShootedComputerBrick != nullptr && 
+				lastShootedComputerBrick->isPartOfAShip == true && 
+				!IsShipDestroyed(firstPlayerShips, lastShootedComputerBrick, ship))
+			{
+				std::uniform_int_distribution<int> distribution(-1, 1);
+
+				if (ship->position == Ship::Position::Horizontal)
+				{
+					x = lastShootedX + distribution(generator);
+					y = lastShootedY;
+				}
+				else
+				{
+					x = lastShootedX;
+					y = lastShootedY + distribution(generator);
+				}
+
+				if (ShootBrick(board, x, y, shootedBrick))
+				{
+					areValuesProper = true;
+					continue;
+				}
+			}
+
 			if (ShootBrick(board, x, y, shootedBrick))
 			{
 				areValuesProper = true;
@@ -377,6 +402,14 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 			}
 
 		} while (!areValuesProper);
+		
+		
+		if (shootedBrick->isPartOfAShip)
+		{
+			lastShootedX = x;
+			lastShootedY = y;
+			lastShootedComputerBrick = shootedBrick;
+		}
 
 		system("CLS");
 		std::cout << computerName << ":\n";
@@ -401,7 +434,7 @@ bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick*& empty
 
 	int index = xBrick + ((yBrick - 1) * boardSize) - 1;
 
-	if (board.bricks[index].state == Brick::BrickState::Shot)
+	if (board.bricks[index].state == Brick::State::Shot)
 	{
 		return false;
 	}
@@ -539,7 +572,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				bricksForShips.push_back(chosenBricks[i]);
 			}
 
-			Ship ship = Ship(bricksForShips, shipSize);
+			Ship ship = Ship(bricksForShips, Ship::Position::Horizontal, shipSize);
 			playerShipsVector.push_back(ship);
 		}
 		break;
@@ -604,7 +637,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 				bricksForShips.push_back(chosenBricks[i]);
 			}
 
-			Ship ship = Ship(bricksForShips, shipSize);
+			Ship ship = Ship(bricksForShips, Ship::Position::Vertical, shipSize);
 			playerShipsVector.push_back(ship);
 		}
 		break;
@@ -642,7 +675,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 		brick->SetPartOfAShip();
 		bricksForShips.push_back(brick);
 
-		Ship ship = Ship(bricksForShips);
+		Ship ship = Ship(bricksForShips, Ship::Position::Horizontal);
 		playerShipsVector.push_back(ship);
 	}
 
@@ -718,7 +751,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 				bricksForShips.push_back(chosenBricks[i]);
 			}
 
-			Ship ship = Ship(bricksForShips, shipSize);
+			Ship ship = Ship(bricksForShips, Ship::Position::Horizontal, shipSize);
 			playerShipsVector.push_back(ship);
 		}break;
 		case 1: // vertical
@@ -766,7 +799,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 				bricksForShips.push_back(chosenBricks[i]);
 			}
 
-			Ship ship = Ship(bricksForShips, shipSize);
+			Ship ship = Ship(bricksForShips, Ship::Position::Vertical, shipSize);
 			playerShipsVector.push_back(ship);
 		}break;
 		}
@@ -792,7 +825,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 		brick->SetPartOfAShip();
 		bricksForShips.push_back(brick);
 
-		Ship ship = Ship(bricksForShips);
+		Ship ship = Ship(bricksForShips, Ship::Position::Horizontal);
 		playerShipsVector.push_back(ship);
 	}
 }
@@ -811,7 +844,7 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 		int bricksDestroyed = 0;
 		for (size_t j = 0; j < playerShips[i].shipsBricks.size() ; j++)
 		{
-			if (playerShips[i].shipsBricks[j]->state == Brick::BrickState::Shot)
+			if (playerShips[i].shipsBricks[j]->state == Brick::State::Shot)
 				bricksDestroyed++;
 		}
 
@@ -827,6 +860,38 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 		return false;
 	else
 		return true;
+}
+
+bool GameManager::IsShipDestroyed(std::vector<Ship>& playerShips, Brick* shipsBrick, Ship*& shipPtr)
+{
+	for (size_t i = 0; i < playerShips.size(); i++)
+	{
+		for (size_t j = 0; j < playerShips[i].size; j++)
+		{
+			if (playerShips[i].shipsBricks[j] == shipsBrick)
+			{
+				shipPtr = &playerShips[i];
+				break;
+			}
+		}
+	}
+
+	if (shipPtr != nullptr)
+	{
+		for (size_t i = 0; i < shipPtr->size; i++)
+		{
+			if (shipPtr->shipsBricks[i]->state != Brick::State::Shot)
+			{
+				return false;
+			}
+		}
+	}
+	else
+	{
+		std::cout << "ERROR SHIP";
+	}
+
+	return true;
 }
 
 bool GameManager::CheckIfBrickConnectToAnyShip(Board& board, int brickIndex)

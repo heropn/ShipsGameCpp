@@ -3,7 +3,7 @@
 Brick::Brick()
 {
 	isPartOfAShip = false;
-	state = BrickState::Hidden;
+	state = State::Hidden;
 	x = 0;
 	y = 0;
 }
@@ -13,12 +13,12 @@ Brick::Brick(unsigned int x, unsigned int y)
 	this->x = x;
 	this->y = y;
 	isPartOfAShip = false;
-	state = BrickState::Hidden;
+	state = State::Hidden;
 }
 
 char Brick::Spawn()
 {
-	if (state == BrickState::Hidden)
+	if (state == State::Hidden)
 	{
 		return char(0xFE);
 	}
@@ -39,15 +39,15 @@ void Brick::SetPartOfAShip()
 
 void Brick::Shoot()
 {
-	state = BrickState::Shot;
+	state = State::Shot;
 }
 
 void Brick::Show()
 {
-	state = BrickState::Showed;
+	state = State::Showed;
 }
 
 void Brick::Hide()
 {
-	state = BrickState::Hidden;
+	state = State::Hidden;
 }

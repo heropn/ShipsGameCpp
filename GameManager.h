@@ -11,6 +11,8 @@ public:
 
 private:
 	Board firstBoard, secondBoard;
+	Brick* lastShootedComputerBrick = nullptr;
+	int lastShootedY, lastShootedX;
 	bool isGameRunning = false;
 	bool versusComputer = false;
 	int boardSize;
@@ -30,4 +32,5 @@ private:
 	bool ShootBrick(Board& board, int xBrick, int yBrick, Brick*& emptyBrickPtr);
 	bool AreAllShipsDestroyed(std::vector<Ship>& playerShips);
 	bool CheckIfBrickConnectToAnyShip(Board& board, int brickIndex);
+	bool IsShipDestroyed(std::vector<Ship>& playerShips, Brick* shipsBrick, Ship*& emptyShipPtr);
 };

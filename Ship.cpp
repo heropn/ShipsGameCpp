@@ -1,7 +1,8 @@
 #include "Ship.h"
 
-Ship::Ship(std::vector<Brick*>& bricksForShip, size_t size)
+Ship::Ship(std::vector<Brick*>& bricksForShip, Position position, size_t size)
 {
+	this->position = position;
 	this->size = size;
 	shipsBricks = bricksForShip;
 

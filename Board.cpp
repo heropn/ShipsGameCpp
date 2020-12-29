@@ -51,9 +51,7 @@ void Board::SpawnBoard()
 			else if (j == 0 && i != 0)
 				std::cout << i << " ";
 			else if (i != 0)
-			{
 				std::cout << bricks[index++].Spawn() << " ";
-			}
 		}
 		std::cout << std::endl;
 	}
