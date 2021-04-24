@@ -7,17 +7,17 @@ class GameManager
 {
 public:
 	void Play();
-	GameManager();
+	void DisplayRules();
 
 private:
 	Board firstBoard, secondBoard;
 	Brick* lastShootedComputerBrick = nullptr;
-	int lastShootedY, lastShootedX;
+	int lastShootedY{}, lastShootedX{};
 	bool isGameRunning = false;
 	bool versusComputer = false;
-	int boardSize;
-	int numberOfPlayers;
-	int  waitShowTimeSeconds = 1;
+	int boardSize{};
+	int numberOfPlayers{};
+	int waitShowTimeSeconds = 1;
 	int waitBetweenPlayersSeconds = 1;
 	std::vector<Ship> firstPlayerShips, secondPlayersShips;
 
@@ -31,6 +31,6 @@ private:
 
 	bool ShootBrick(Board& board, int xBrick, int yBrick, Brick*& emptyBrickPtr);
 	bool AreAllShipsDestroyed(std::vector<Ship>& playerShips);
-	bool CheckIfBrickConnectToAnyShip(Board& board, int brickIndex);
+	bool CheckIfBrickConnectToAnyShip(Board& board, int brickIndex, bool computerMode = false);
 	bool IsShipDestroyed(std::vector<Ship>& playerShips, Brick* shipsBrick, Ship*& emptyShipPtr);
 };

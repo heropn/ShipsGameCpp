@@ -9,28 +9,38 @@ int main()
 	do
 	{
 		GameManager game;
-		game.Play();
 
-		system("CLS");
+		system("cls");
+		std::cout << "1. Graj" << std::endl;
+		std::cout << "2. Zasady gry" << std::endl;
+		std::cout << "3. Wyjdz" << std::endl;
 
-		std::cout << "Do you want to play again?" << std::endl << "Yes: type 1	No: type 0" << std::endl;
-		std::string input = "-";
+		std::string input = "";
 
-		while (input != "1" && input != "0")
+		while (input != "1" && input != "2" && input != "3")
 		{
 			std::cin >> input;
 
-			if (input != "1" && input != "0")
+			if (input == "1")
 			{
-				std::cout << "Wrong value" << std::endl;
-				continue;
+				system("cls");
+				game.Play();
+				system("pause");
+			}
+			else if (input == "2")
+			{
+				system("cls");
+				game.DisplayRules();
+				system("pause");
+			}
+			else if (input == "3")
+			{
+				return 0;
+			}
+			else
+			{
+				std::cout << "Zla wartosc!" << std::endl;
 			}
 		}
-
-		if (input == "0")
-			break;
-
 	} while (true);
-
-	system("pause");
 }

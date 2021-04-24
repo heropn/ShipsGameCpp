@@ -4,9 +4,9 @@
 #include <Windows.h>
 #include "GameManager.h"
 
-GameManager::GameManager()
+void GameManager::Play()
 {
-	std::cout << "How big should be the board (number has to be between 4 and 8): ";
+	std::cout << "Jak wielka ma byc plansza (rozmiar musi zawierac sie pomiedzy 4 i 8): ";
 	std::string boardSize = "0";
 
 	std::cin >> boardSize;
@@ -14,90 +14,82 @@ GameManager::GameManager()
 	while (boardSize < "4" || boardSize > "8")
 	{
 		if (boardSize < "4" || boardSize > "8")
-			std::cout << "Wrong value\n";
+			std::cout << "Zla wartosc\n";
 
 		std::cin >> boardSize;
 	}
 
+	//Zamienienie stringa na inta
 	std::stringstream(boardSize) >> this->boardSize;
 
-	std::cout << "How many players (1 or 2): ";
+	std::cout << "Ile graczy (1 lub 2): ";
 	std::string numberOfPlayersStr = "0";
-	
+
 	while (numberOfPlayersStr != "1" && numberOfPlayersStr != "2")
 	{
 		std::cin >> numberOfPlayersStr;
 
 		if (numberOfPlayersStr != "1" && numberOfPlayersStr != "2")
-			std::cout << "Wrong value\n";
+			std::cout << "Zla wartosc\n";
 	}
-
+	
+	//Zamienienie stringa na inta
 	std::stringstream(numberOfPlayersStr) >> this->numberOfPlayers;
 
 	if (this->numberOfPlayers == 1)
 	{
-		std::cout << "Do you wish to play vs computer?" << std::endl << "Yes: type 1	No: type 0" << std::endl;
-		std::string numberStr = "-";
-		versusComputer = false;
-
-		while (numberStr != "0" && numberStr != "1")
-		{
-			std::cin >> numberStr;
-
-			if (numberStr != "0" && numberStr != "1")
-				std::cout << "Wrong input\n";
-		}
-		
-		if (numberStr == "1")
-			versusComputer = true;
+		versusComputer = true;
 	}
 
-	std::cout << "Do you want to place your ships by yourself or you want to let it be random?" << std::endl;
+	std::cout << "Czy chcialbys ustawiac statki samodzielnie, czy chcesz zeby bylo to zrobione automatycznie?" << std::endl;
 
 	std::string numberStr = "-";
-	std::cout << "Automatic: Type 1	Place by yourself: Type 0" << std::endl;
+	std::cout << "Automatyczne: napisz 1	Samodzielnie: napisz 0" << std::endl;
 
 	while (numberStr != "0" && numberStr != "1")
 	{
 		std::cin >> numberStr;
 
 		if (numberStr != "0" && numberStr != "1")
-			std::cout << "Wrong value\n";
+			std::cout << "Zla wartosc\n";
 	}
-	
+
 	int number;
+
+	//Zamienienie stringa na inta
 	std::stringstream(numberStr) >> number;
 	bool isAutomatic = number;
-	
+
 	system("CLS");
 
 	isGameRunning = true;
 
+	//Przygotowanie plansz do gry, odpowiednio od trybu oraz rozmieszczenie statkow
 	if (this->numberOfPlayers == 1)
 	{
 		if (versusComputer)
 		{
 			firstBoard = Board(this->boardSize);
 			secondBoard = Board(this->boardSize);
-			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
+			SetShips(firstBoard, firstPlayerShips, "Ty", isAutomatic);
 			SetShips(secondBoard, secondPlayersShips, "", true);
 		}
 		else
 		{
 			firstBoard = Board(this->boardSize);
-			SetShips(firstBoard, firstPlayerShips, "You", isAutomatic);
+			SetShips(firstBoard, firstPlayerShips, "Ty", isAutomatic);
 		}
 	}
 	else
 	{
 		firstBoard = Board(this->boardSize);
 		secondBoard = Board(this->boardSize);
-		SetShips(firstBoard, firstPlayerShips, "First Player", isAutomatic);
+		SetShips(firstBoard, firstPlayerShips, "Pierwszy Gracz", isAutomatic);
 
 		if (!isAutomatic)
 		{
 			system("CLS");
-			std::cout << "Next player in: ";
+			std::cout << "Nastpeny gracz za: ";
 			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 			{
 				std::cout << i << std::endl;
@@ -105,12 +97,10 @@ GameManager::GameManager()
 			}
 		}
 
-		SetShips(secondBoard, secondPlayersShips, "Second Player", isAutomatic);
+		SetShips(secondBoard, secondPlayersShips, "Drugi Gracz", isAutomatic);
 	}
-}
 
-void GameManager::Play()
-{
+	//Zaczecie gry
 	if (numberOfPlayers == 1)
 	{
 		if (versusComputer)
@@ -121,11 +111,11 @@ void GameManager::Play()
 			{
 				system("CLS");
 
-				std::cout << "You:\n";
+				std::cout << "Ty:\n";
 
 				secondBoard.SpawnBoard();
 
-				Move(secondBoard, secondPlayersShips, "You");
+				Move(secondBoard, secondPlayersShips, "Ty");
 
 				if (!isGameRunning)
 				{
@@ -134,7 +124,7 @@ void GameManager::Play()
 				}
 
 				system("CLS");
-				std::cout << "Computer moves in: ";
+				std::cout << "Tura komputera za: ";
 				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 				{
 					std::cout << i << std::endl;
@@ -143,12 +133,12 @@ void GameManager::Play()
 
 				system("CLS");
 
-				std::cout << "Computer:\n";
+				std::cout << "Komputer:\n";
 
 				firstBoard.SpawnBoard();
 				Wait(1);
 
-				MoveComputer(firstBoard, firstPlayerShips, "Computer");
+				MoveComputer(firstBoard, firstPlayerShips, "Komputer");
 
 				if (!isGameRunning)
 				{
@@ -157,7 +147,7 @@ void GameManager::Play()
 				}
 
 				system("CLS");
-				std::cout << "Your move in: ";
+				std::cout << "Twoj ruch za: ";
 				for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 				{
 					std::cout << i << std::endl;
@@ -166,9 +156,9 @@ void GameManager::Play()
 			}
 
 			if (firstPlayerWon)
-				std::cout << "Congratulations you've won :D" << std::endl;
+				std::cout << "Gratulacje, wygrales! :)" << std::endl;
 			else
-				std::cout << "Unfortunately computer won :(" << std::endl;
+				std::cout << "Niestety komputer wygral :(" << std::endl;
 		}
 		else
 		{
@@ -177,14 +167,14 @@ void GameManager::Play()
 				bool areValuesProper = false;
 
 				system("CLS");
-				std::cout << "You:\n";
+				std::cout << "Ty:\n";
 
 				firstBoard.SpawnBoard();
 
-				Move(firstBoard, firstPlayerShips, "You");
+				Move(firstBoard, firstPlayerShips, "Ty");
 
 				system("CLS");
-				std::cout << "You:\n";
+				std::cout << "Ty:\n";
 				firstBoard.SpawnBoard();
 
 				if (AreAllShipsDestroyed(firstPlayerShips))
@@ -193,7 +183,7 @@ void GameManager::Play()
 				}
 			}
 
-			std::cout << "Congratulations you've won :D" << std::endl;
+			std::cout << "Gratulacje, wygrales! :)" << std::endl;
 		}
 	}
 	else
@@ -204,17 +194,17 @@ void GameManager::Play()
 		{
 			system("CLS");
 
-			std::cout << "First Player:\n";
+			std::cout << "Pierwszy Gracz:\n";
 			
 			secondBoard.SpawnBoard();
 
-			Move(secondBoard, secondPlayersShips, "First Player");
+			Move(secondBoard, secondPlayersShips, "Pierwszy Gracz");
 
 			if (!isGameRunning)
 				continue;
 
 			system("CLS");
-			std::cout << "Next player in: ";
+			std::cout << "Nastepny gracz za: ";
 			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 			{
 				std::cout << i << std::endl;
@@ -223,17 +213,17 @@ void GameManager::Play()
 
 			system("CLS");
 
-			std::cout << "Second Player:\n";
+			std::cout << "Drugi gracz:\n";
 
 			firstBoard.SpawnBoard();
 
-			Move(firstBoard, firstPlayerShips, "Second Player");
+			Move(firstBoard, firstPlayerShips, "Drugi gracz");
 
 			if (!isGameRunning)
 				continue;
 
 			system("CLS");
-			std::cout << "Next player in: ";
+			std::cout << "Nastpeny gracz za: ";
 			for (int i = waitBetweenPlayersSeconds; i > 0; i--)
 			{
 				std::cout << i << std::endl;
@@ -242,26 +232,42 @@ void GameManager::Play()
 		}
 
 		if (firstPlayerWon)
-			std::cout << "Congratulations first player won :D" << std::endl;
+			std::cout << "Gratulacje, Pierwszy Gracz wygra³! :)" << std::endl;
 		else
-			std::cout << "Congratulations second player won :D" << std::endl;
+			std::cout << "Gratulacje, Drugi Gracz wygra³! :)" << std::endl;
 	}
 
 	Wait(3);
 }
 
+void GameManager::DisplayRules()
+{
+	std::cout << "Zasady gry:" << std::endl;
+	std::cout << "\t1. Strzal w statki:" << std::endl;
+	std::cout << "W statki strzelamy wpisujac odpowiednie wspolrzedne o ktore poprosi program, tj. A4, c5. Kolejnosc, ani wielkosc liter nie ma znaczenia" << std::endl;
+	std::cout << "\t2. Wybieranie miejsc na ustawienie statkow:" << std::endl;
+	std::cout << "Statki ustawiamy najpierw decydujac, czy chcemy dany statek ustawic horyzontalnie lub wertykalnie, a nastepnie" << std::endl;
+	std::cout << "wybieramy pole od ktorego chcemy go ustawic. Statki horyzontalne ustawiaja sie na prawo od wybranego pola, natomiast" << std::endl;
+	std::cout << "statki wertykalne ustawiaja sie od wybranego pola do dolu." << std::endl;
+	std::cout << "\t3. Cel gry" << std::endl;
+	std::cout << "Gra konczy sie w momencie, w ktorym ktorys z graczy zestrzeli wszystkie statki przeciwnika" << std::endl;
+
+}
+
 void GameManager::GetCoordinates(int& x, int& y)
 {
 	bool areValuesProper = true;
+
+	//Petla ktora bedzie sie wykonowyala dopoki gracze nie wpisze poprawnych koordynatow na pole
 	do
 	{
 		if (!areValuesProper)
-			std::cout << "Wrong values, please try again" << std::endl;
+			std::cout << "Zla wartosc" << std::endl;
 
 		areValuesProper = false;
 		std::string input;
 
-		std::cout << "Enter brick coordinates: ";
+		std::cout << "Wpisz koordynaty pola: ";
 		std::cin >> input;
 
 		if (input.size() != 2)
@@ -319,10 +325,11 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string
 
 	do
 	{
+		//Petla ktora sprawdza czy dane koordynaty na pole sa poprawne
 		do
 		{
 			if (!areValuesProper)
-				std::cout << "Wrong values, please try again" << std::endl;
+				std::cout << "Zle wartosci" << std::endl;
 
 			areValuesProper = false;
 
@@ -335,6 +342,7 @@ void GameManager::Move(Board& board, std::vector<Ship>& ships, const std::string
 
 		} while (!areValuesProper);
 
+		//Pojawienia sie zakutalizowanej planszy z nowo zestrzelonym polem
 		system("CLS");
 		std::cout << playerName << ":\n";
 		board.SpawnBoard();
@@ -362,6 +370,7 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 		{
 			areValuesProper = false;
 
+			//Stworzenie generatora do pseudo losowych liczb i wygenerowanie losowych wspolrzednych
 			std::random_device device;
 			std::mt19937 generator(device());
 			std::uniform_int_distribution<int> distribution(1, this->boardSize);
@@ -371,21 +380,40 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 
 			Ship* ship = nullptr;
 
+			//If, ktory wykona sie jezeli w poprzednim ruchu komputer trafi statek i nie zostal on zatopiony
 			if (lastShootedComputerBrick != nullptr && 
 				lastShootedComputerBrick->isPartOfAShip == true && 
 				!IsShipDestroyed(firstPlayerShips, lastShootedComputerBrick, ship))
 			{
 				std::uniform_int_distribution<int> distribution(-1, 1);
 
+				//W zaleznosci czy statek jest ustawiony horyzontalnie, czy wertykalnie, strzelanie w losowo wybranym kierunku
+
 				if (ship->position == Ship::Position::Horizontal)
 				{
 					x = lastShootedX + distribution(generator);
 					y = lastShootedY;
+
+					int index = x + ((y - 1) * boardSize) - 1;
+
+					while (board.bricks[index].isPartOfAShip && board.bricks[index].state == Brick::State::Shot)
+					{
+						x += distribution(generator);
+						index = x + ((y - 1) * boardSize) - 1;
+					}
 				}
 				else
 				{
 					x = lastShootedX;
 					y = lastShootedY + distribution(generator);
+
+					int index = x + ((y - 1) * boardSize) - 1;
+
+					while (board.bricks[index].isPartOfAShip && board.bricks[index].state == Brick::State::Shot)
+					{
+						y += distribution(generator);
+						index = x + ((y - 1) * boardSize) - 1;
+					}
 				}
 
 				if (ShootBrick(board, x, y, shootedBrick))
@@ -394,15 +422,19 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 					continue;
 				}
 			}
-
-			if (ShootBrick(board, x, y, shootedBrick))
+			else
 			{
-				areValuesProper = true;
-				continue;
+				int index = x + ((y - 1) * boardSize) - 1;
+
+				// Strzelenie komputera wtedy i tylko wtedy, gdy pole nie jest obok pola z zestrzelona juz czescia statku
+				if (!CheckIfBrickConnectToAnyShip(board, index, true) && ShootBrick(board, x, y, shootedBrick))
+				{
+					areValuesProper = true;
+					continue;
+				}
 			}
 
 		} while (!areValuesProper);
-		
 		
 		if (shootedBrick->isPartOfAShip)
 		{
@@ -428,10 +460,11 @@ void GameManager::MoveComputer(Board& board, std::vector<Ship>& ships, const std
 
 bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick*& emptyBrickPtr)
 {
+	//Walidacja wspolrzednych
 	if (xBrick > boardSize || yBrick > boardSize || xBrick < 1 || yBrick < 1)
 		return false;
 
-
+	//wylizenie indexu bricka w vectorze
 	int index = xBrick + ((yBrick - 1) * boardSize) - 1;
 
 	if (board.bricks[index].state == Brick::State::Shot)
@@ -446,6 +479,7 @@ bool GameManager::ShootBrick(Board& board, int xBrick, int yBrick, Brick*& empty
 
 void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, const std::string& playerName, bool isAutomatic)
 {
+	//Pojawienie sie wszystkich pol odkrytych jesli gracz wybral samodzielne rozstawienie statkow
 	if (!isAutomatic)
 	{
 		system("cls");
@@ -457,6 +491,7 @@ void GameManager::SetShips(Board& board, std::vector<Ship>& playerShipsVector, c
 	int biggestShipSize = this->boardSize / 2;
 	int shipSize = biggestShipSize;
 
+	//Algorytm obliczajacy ile statkow ustawic w zaleznosci od rozmiaru planszy
 	for (int i = biggestShipSize; i > 0; i--)
 	{
 		int shipsNumber = this->boardSize / shipSize;
@@ -494,8 +529,8 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 {
 	if (shipSize != 1)
 	{
-		std::cout << "Do you want to place ship with size " << shipSize << " vertical or horizontal?" << std::endl;
-		std::cout << "Vertical: Type 1	Horizontal: Type 0" << std::endl;
+		std::cout << "Chcesz polozyc statek o rozmiarze " << shipSize << " wertykalnie, czy horyzotnalnie?" << std::endl;
+		std::cout << "Wertykalnie: napisz 1	Horyzontalnie: napisz 0" << std::endl;
 		int shipPlacment;
 		std::string shipPlacementStr;
 		
@@ -504,7 +539,7 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 			std::cin >> shipPlacementStr;
 
 			if (shipPlacementStr != "0" && shipPlacementStr != "1")
-				std::cout << "Wrong Value" << std::endl;
+				std::cout << "Zla wartosc" << std::endl;
 
 		} while (shipPlacementStr != "0" && shipPlacementStr != "1");
 
@@ -512,21 +547,21 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 
 		switch (shipPlacment)
 		{
-		case 0: // horizontal
+		case 0: // horyzontalnie
 		{
 			Brick* brick = nullptr;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
-			std::cout << "Horizontal ships are placed from chosen brick to the right" << std::endl;
+			std::cout << "Horyzontalne statki sa polozone na prawo od wybranego pola" << std::endl;
 
 			bool areValuesProper = true;
 			int x, y;
 
-			//check if x and y are good, check if there is a ship, check if all bricks around are available
+			//Sprawdzenie, czy x i y sa poprawnie oraz czy jest tak statek i czy wszystkie pola wokol sa wolne
 			do
 			{
 				if (!areValuesProper)
-					std::cout << "Wrong values, please try again" << std::endl;
+					std::cout << "Zla wartosc" << std::endl;
 
 				chosenBricks.clear();
 				areValuesProper = true;
@@ -576,22 +611,22 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 			playerShipsVector.push_back(ship);
 		}
 		break;
-		case 1: // vertical
+		case 1: // vertykalnie
 		{
 			Brick* brick = nullptr;
 			std::vector<Brick*> chosenBricks;
 			std::vector<Brick*> bricksForShips;
 			std::string xStr, yStr;
-			std::cout << "Vertical ships are placed from chosen brick to the bottom" << std::endl;
+			std::cout << "Wertykalne statki sa polozone od wybranego pola do dolu" << std::endl;
 
 			bool areValuesProper = true;
 			int x, y;
 
-			//check if x and y are good, check if there is a ship, check if all bricks around are available
+			//Sprawdzenie, czy x i y sa poprawnie oraz czy jest tak statek i czy wszystkie pola wokol sa wolne
 			do
 			{
 				if (!areValuesProper)
-					std::cout << "Wrong values, please try again" << std::endl;
+					std::cout << "Zla wartosc" << std::endl;
 
 				chosenBricks.clear();
 				areValuesProper = true;
@@ -652,12 +687,13 @@ void GameManager::SetShipByPlayer(Board& board, std::vector<Ship>& playerShipsVe
 		bool areValuesProper = true;
 		int x, y;
 
-		std::cout << "Where do you want to place ship with size " << shipSize << '?' << std::endl;
+		std::cout << "Gdzie chcesz polozyc swoj statek o rozmiarze " << shipSize << '?' << std::endl;
 
+		//Sprawdzenie, czy x i y sa poprawnie oraz czy jest tak statek i czy wszystkie pola wokol sa wolne
 		do
 		{
 			if (!areValuesProper)
-				std::cout << "Wrong values, please try again" << std::endl;
+				std::cout << "Zla wartosc" << std::endl;
 
 			areValuesProper = true;
 
@@ -698,7 +734,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 
 		switch (random % 2)
 		{
-		case 0: // horizontal
+		case 0: // horyzontalnie
 		{
 			Brick* brick;
 			std::vector<Brick*> chosenBricks;
@@ -710,7 +746,7 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 				chosenBricks.clear();
 
 				random = distribution(generator);
-				int rightSideDistance = this->boardSize - (random % this->boardSize); // how far away from right side
+				int rightSideDistance = this->boardSize - (random % this->boardSize); // Jak daleko z prawej strony
 
 				while (rightSideDistance < shipSize)
 				{
@@ -754,11 +790,11 @@ void GameManager::SetShipAutomaticlly(Board& board, std::vector<Ship>& playerShi
 			Ship ship = Ship(bricksForShips, Ship::Position::Horizontal, shipSize);
 			playerShipsVector.push_back(ship);
 		}break;
-		case 1: // vertical
+		case 1: // wertykalnie
 		{
 			Brick* brick;
 			std::vector<Brick*> chosenBricks;
-			distribution = std::uniform_int_distribution<int>(0, ((this->boardSize * this->boardSize) - 1) - (this->boardSize * (shipSize - 1))); //maxindex - (boardSize * (shipSize - 1))
+			distribution = std::uniform_int_distribution<int>(0, ((this->boardSize * this->boardSize) - 1) - (this->boardSize * (shipSize - 1)));
 			bool isEveryBrickAvaliable;
 
 			do
@@ -839,6 +875,7 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 {
 	int sumOfSizes = 0;
 
+	//Sprawdzenie czy wszystkie statki sa zniszczone
 	for (size_t i = 0; i < playerShips.size(); i++)
 	{
 		int bricksDestroyed = 0;
@@ -848,9 +885,10 @@ bool GameManager::AreAllShipsDestroyed(std::vector<Ship>& playerShips)
 				bricksDestroyed++;
 		}
 
+		//Jezeli statek zostal zniszczony to wypisanie informacji o tym jaki mial rozmiar oraz ze zostal zniszczony
 		if (playerShips[i].size == bricksDestroyed)
 		{
-			std::cout << "You've destoyed a ship with size: " << playerShips[i].shipsBricks.size() << std::endl;
+			std::cout << "Zniszczony statek o rozmiarze: " << playerShips[i].shipsBricks.size() << std::endl;
 			playerShips[i].size = 0;
 		}
 
@@ -886,15 +924,11 @@ bool GameManager::IsShipDestroyed(std::vector<Ship>& playerShips, Brick* shipsBr
 			}
 		}
 	}
-	else
-	{
-		std::cout << "ERROR SHIP";
-	}
 
 	return true;
 }
 
-bool GameManager::CheckIfBrickConnectToAnyShip(Board& board, int brickIndex)
+bool GameManager::CheckIfBrickConnectToAnyShip(Board& board, int brickIndex, bool computerMode)
 {
 	int indexBelow = (brickIndex + this->boardSize > (this->boardSize * this->boardSize) - 1) 
 		? brickIndex 
@@ -913,8 +947,16 @@ bool GameManager::CheckIfBrickConnectToAnyShip(Board& board, int brickIndex)
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (board.bricks[indexes[i]].isPartOfAShip)
-			return true;
+		if (computerMode)
+		{
+			if (board.bricks[indexes[i]].isPartOfAShip && board.bricks[indexes[i]].state == Brick::State::Shot)
+				return true;
+		}
+		else
+		{
+			if (board.bricks[indexes[i]].isPartOfAShip)
+				return true;
+		}
 	}
 
 	return false;
